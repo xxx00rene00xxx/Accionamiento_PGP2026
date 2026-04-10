@@ -17,14 +17,14 @@
         @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .card-glow { transition: all 0.3s ease; }
         .card-glow:hover { transform: translateY(-2px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.05); }
-        #auth-modal { backdrop-filter: blur(8px); background: rgba(15, 23, 42, 0.6); }
         .progress-btn:active { transform: scale(0.95); }
         .pending-change { background-color: #fff7ed !important; border-left: 4px solid #f97316 !important; }
+        canvas { max-width: 100% !important; height: auto !important; }
     </style>
 </head>
 <body class="bg-[#f8fafc] min-h-screen text-slate-900">
 
-    <!-- Botón de Sincronización Masiva (Flotante) -->
+    <!-- Sincronización Flotante -->
     <div id="sync-fab" class="fixed bottom-8 right-8 z-[120] hidden">
         <button onclick="confirmBulkUpdate()" class="bg-orange-600 hover:bg-orange-700 text-white font-black px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-3 transition-all scale-100 hover:scale-105 active:scale-95 border-4 border-white">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
@@ -32,12 +32,12 @@
         </button>
     </div>
 
-    <!-- Modal de Confirmación Masiva -->
+    <!-- Modales -->
     <div id="confirm-modal" class="fixed inset-0 z-[130] flex items-center justify-center p-6 hidden">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
-        <div class="relative bg-white p-8 rounded-[2.5rem] shadow-2xl border border-slate-100 w-full max-w-sm text-center">
+        <div class="relative bg-white p-8 rounded-[2.5rem] shadow-2xl border border-slate-100 w-full max-sm text-center">
             <h3 class="text-xl font-black text-slate-900 uppercase italic mb-2">Confirmar Envío</h3>
-            <p id="confirm-text" class="text-sm text-slate-500 font-bold mb-6 italic">¿Deseas enviar todas las modificaciones a Google Sheets?</p>
+            <p id="confirm-text" class="text-sm text-slate-500 font-bold mb-6 italic">¿Deseas enviar las modificaciones?</p>
             <div class="flex gap-2">
                 <button onclick="closeConfirm()" class="flex-1 bg-slate-100 text-slate-400 font-black py-4 rounded-2xl uppercase text-xs tracking-widest">Revisar</button>
                 <button onclick="sendBulkUpdate()" class="flex-[2] bg-blue-600 text-white font-black py-4 rounded-2xl uppercase text-xs tracking-widest shadow-lg shadow-blue-100">Sí, Sincronizar</button>
@@ -45,37 +45,31 @@
         </div>
     </div>
 
-    <!-- Modal de Autenticación -->
     <div id="auth-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-6 hidden">
         <div class="bg-white p-8 rounded-[2.5rem] shadow-2xl border border-slate-100 w-full max-w-md text-center">
             <h2 class="text-3xl font-black italic uppercase tracking-tighter text-slate-900 mb-2">Modo <span class="text-blue-600">Editor</span></h2>
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-8 italic">Se requiere autorización</p>
             <div class="space-y-4">
                 <input type="text" id="user-input" placeholder="Usuario" class="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-bold text-sm">
                 <input type="password" id="pass-input" placeholder="Contraseña" class="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-bold text-sm">
                 <div class="flex gap-2">
-                    <button onclick="toggleAuthModal(false)" class="flex-1 bg-slate-100 text-slate-400 font-black py-4 rounded-2xl uppercase text-xs tracking-widest hover:bg-slate-200 transition-all">Cancelar</button>
-                    <button onclick="handleLogin()" class="flex-[2] bg-slate-900 text-white font-black py-4 rounded-2xl uppercase text-xs tracking-widest hover:bg-blue-600 transition-all shadow-lg shadow-blue-100">Entrar</button>
+                    <button onclick="toggleAuthModal(false)" class="flex-1 bg-slate-100 text-slate-400 font-black py-4 rounded-2xl uppercase text-xs tracking-widest">Cancelar</button>
+                    <button onclick="handleLogin()" class="flex-[2] bg-slate-900 text-white font-black py-4 rounded-2xl uppercase text-xs tracking-widest">Entrar</button>
                 </div>
-                <p id="auth-error" class="hidden text-rose-500 text-[10px] font-black uppercase italic mt-2">Credenciales Incorrectas</p>
             </div>
         </div>
     </div>
 
-    <!-- Pantalla de Carga -->
     <div id="loading-overlay" class="fixed inset-0 bg-white z-[60] flex flex-col items-center justify-center text-center px-6 hidden">
         <div class="loader ease-linear rounded-full border-4 border-t-4 border-slate-200 h-12 w-12 mb-4"></div>
-        <p id="loading-text" class="font-black text-xs uppercase tracking-widest text-slate-400 italic">Sincronizando con Google Sheets...</p>
+        <p class="font-black text-xs uppercase tracking-widest text-slate-400 italic">Procesando información...</p>
     </div>
 
-    <!-- Notificación Toast -->
     <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[150] px-6 py-3 rounded-full bg-slate-900 text-white font-black text-[10px] uppercase tracking-widest shadow-2xl transition-all opacity-0 translate-y-10 pointer-events-none flex items-center gap-3">
         <span id="toast-icon"></span>
         <span id="toast-msg">Mensaje</span>
     </div>
 
-    <!-- Contenedor Principal Ajustado (Márgenes más pequeños) -->
-    <div id="main-content" class="max-w-[98%] mx-auto px-2 md:px-4 py-8">
+    <div class="max-w-[98%] mx-auto px-2 md:px-4 py-8">
         <header class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-slate-200 pb-6">
             <div>
                 <div class="flex items-center gap-2 mb-1">
@@ -86,38 +80,100 @@
                 <h1 class="text-4xl font-extrabold tracking-tighter text-slate-900 uppercase italic">Control <span class="text-blue-600 text-5xl">PGP 2026</span></h1>
             </div>
             <div class="flex flex-wrap items-center justify-end gap-3">
-                <button id="btn-login" onclick="toggleAuthModal(true)" class="bg-white border-2 border-slate-900 text-slate-900 font-black px-6 py-3 rounded-2xl uppercase text-[10px] tracking-widest hover:bg-slate-900 hover:text-white transition-all">Acceso Editor</button>
+                <button onclick="toggleAuthModal(true)" class="bg-white border-2 border-slate-900 text-slate-900 font-black px-6 py-3 rounded-2xl uppercase text-[10px] tracking-widest hover:bg-slate-900 hover:text-white transition-all">Acceso Editor</button>
                 <div class="bg-white border border-slate-200 px-6 py-3 rounded-3xl shadow-sm flex flex-col items-end min-w-[150px]">
-                    <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 italic">Google Sheet Sync</span>
                     <span id="sync-time" class="font-black text-xl leading-tight text-slate-800 uppercase">--:--</span>
                 </div>
             </div>
         </header>
 
         <nav class="flex overflow-x-auto gap-8 mb-8 border-b border-slate-200 no-scrollbar">
-            <button onclick="switchTab('heatmap')" id="btn-tab-heatmap" class="tab-active pb-4 font-black uppercase text-xs tracking-widest whitespace-nowrap">Ocupación Salas</button>
+            <button onclick="switchTab('master')" id="btn-tab-master" class="tab-active pb-4 font-black uppercase text-xs tracking-widest whitespace-nowrap">Listado Maestro PGP</button>
+            <button onclick="switchTab('heatmap')" id="btn-tab-heatmap" class="pb-4 font-black uppercase text-xs tracking-widest text-slate-400 hover:text-slate-600 whitespace-nowrap">Ocupación Salas</button>
             <button onclick="switchTab('power')" id="btn-tab-power" class="pb-4 font-black uppercase text-xs tracking-widest text-slate-400 hover:text-slate-600 whitespace-nowrap">Análisis Potencia</button>
             <button onclick="switchTab('progress')" id="btn-tab-progress" class="pb-4 font-black uppercase text-xs tracking-widest text-slate-400 hover:text-slate-600 whitespace-nowrap">Checklist Avance</button>
         </nav>
 
         <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
-            <aside class="lg:col-span-1 space-y-6">
+            <!-- Sidebar Global -->
+            <aside id="global-sidebar" class="lg:col-span-1 space-y-6 hidden">
                 <section class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200">
-                    <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 italic text-center">Seleccionar Día</h2>
-                    <div id="day-buttons" class="grid grid-cols-2 gap-2 max-h-[300px] overflow-y-auto pr-1 no-scrollbar text-center"></div>
+                    <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 italic text-center">Seleccionar Día (Global)</h2>
+                    <div id="day-buttons" class="grid grid-cols-2 gap-2 max-h-[400px] overflow-y-auto no-scrollbar pr-1 text-center"></div>
                 </section>
                 <section class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200">
-                    <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 italic">Contratista</h2>
+                    <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 italic text-center">Contratista (Global)</h2>
                     <div id="contract-filters" class="flex flex-col gap-2"></div>
                 </section>
             </aside>
 
-            <div class="lg:col-span-4">
-                <div id="view-heatmap" class="space-y-6">
+            <!-- Contenido Dinámico -->
+            <div id="content-container" class="lg:col-span-5 space-y-6">
+                
+                <!-- VISTA 0: Listado Maestro -->
+                <div id="view-master" class="space-y-6">
+                    <div class="bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-sm">
+                        <div class="flex flex-col gap-6">
+                            <div class="flex items-center gap-4">
+                                <h3 class="font-black text-lg italic uppercase text-slate-800">Filtro de lista:</h3>
+                                <div class="h-px flex-1 bg-slate-100"></div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+                                <div>
+                                    <label class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block italic">Área</label>
+                                    <select id="master-area-select" onchange="updateMasterFilters('area', this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-[11px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500"></select>
+                                </div>
+                                <div>
+                                    <label class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block italic">Sala</label>
+                                    <select id="master-room-select" onchange="updateMasterFilters('room', this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-[11px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500"></select>
+                                </div>
+                                <div>
+                                    <label class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block italic">Contratista</label>
+                                    <select id="master-contract-select" onchange="updateMasterFilters('contract', this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-[11px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500"></select>
+                                </div>
+                                <div>
+                                    <label class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block italic">Día Programado</label>
+                                    <select id="master-day-select" onchange="updateMasterFilters('day', this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-[11px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500"></select>
+                                </div>
+                                <div>
+                                    <label class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block italic">Descripción</label>
+                                    <input type="text" id="master-desc-search" oninput="updateMasterFilters('description', this.value)" placeholder="Filtrar descripción..." class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-[11px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500 italic">
+                                </div>
+                                <div>
+                                    <label class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block italic">OT</label>
+                                    <input type="text" id="master-ot-search" oninput="updateMasterFilters('ot', this.value)" placeholder="Filtrar OT..." class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-[11px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500 italic">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left min-w-[1000px]">
+                                <thead class="border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                    <tr>
+                                        <th class="pb-4 px-2">Área</th>
+                                        <th class="pb-4 px-2">OT</th>
+                                        <th class="pb-4 px-2">Descripción</th>
+                                        <th class="pb-4 px-2">Sala</th>
+                                        <th class="pb-4 px-2">Contrato</th>
+                                        <th class="pb-4 px-2">Potencia</th>
+                                        <th class="pb-4 px-2 text-right">F. Programada</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="master-table-body" class="divide-y divide-slate-50"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vista Ocupación -->
+                <div id="view-heatmap" class="hidden space-y-6">
                     <h2 class="font-black text-xl text-slate-800 italic uppercase">Equipos en Mantención por Sala</h2>
                     <div id="heatmap-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4"></div>
                 </div>
 
+                <!-- Vista Potencia -->
                 <div id="view-power" class="hidden space-y-6">
                     <div id="power-summary" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
                     <div class="bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-sm overflow-hidden">
@@ -138,26 +194,60 @@
                     </div>
                 </div>
 
+                <!-- Vista Checklist Avance -->
                 <div id="view-progress" class="hidden space-y-8">
+                    <!-- Curvas -->
                     <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                        <div class="bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-sm card-glow">
-                            <h3 class="font-black text-xl tracking-tighter text-slate-900 mb-4 italic uppercase">Curva S Global</h3>
-                            <div class="h-[250px] w-full"><canvas id="generalCurveChart"></canvas></div>
+                        <div class="bg-white rounded-[2.5rem] p-6 border border-slate-200 shadow-sm h-[350px]">
+                            <h3 class="font-black text-base tracking-tighter text-slate-900 mb-2 italic uppercase">Curva S Global</h3>
+                            <div class="relative h-[260px]"><canvas id="generalCurveChart"></canvas></div>
                         </div>
-                        <div class="bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-sm card-glow border-l-4 border-l-blue-600">
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="font-black text-xl tracking-tighter text-slate-900 italic uppercase">Por Área</h3>
-                                <select id="room-curve-filter" onchange="renderCurves()" class="bg-slate-50 border border-slate-200 text-[9px] font-black py-2 px-3 rounded-xl outline-none uppercase"></select>
+                        <div class="bg-white rounded-[2.5rem] p-6 border border-slate-200 shadow-sm border-l-4 border-l-blue-600 h-[350px]">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="font-black text-base tracking-tighter text-slate-900 italic uppercase">Por Área</h3>
+                                <select id="room-curve-filter" onchange="renderCurves()" class="bg-slate-50 border border-slate-200 text-[9px] font-black py-1 px-3 rounded-xl outline-none uppercase"></select>
                             </div>
-                            <div class="h-[250px] w-full"><canvas id="roomCurveChart"></canvas></div>
+                            <div class="relative h-[260px]"><canvas id="roomCurveChart"></canvas></div>
                         </div>
                     </div>
 
+                    <!-- Panel de Notificación Progress -->
+                    <div class="bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-sm">
+                        <div class="flex flex-col gap-6">
+                            <div class="flex items-center gap-4">
+                                <h3 class="font-black text-lg italic uppercase text-slate-800">Panel de Notificación</h3>
+                                <div class="h-px flex-1 bg-slate-100"></div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <div>
+                                    <label class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block italic">1. Día de Trabajo</label>
+                                    <select id="prog-day-select" onchange="updateProgFilters('day', this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-[11px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500"></select>
+                                </div>
+                                <div>
+                                    <label class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block italic">2. Sala / Área</label>
+                                    <select id="prog-room-select" onchange="updateProgFilters('room', this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-[11px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500"></select>
+                                </div>
+                                <div>
+                                    <label class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block italic">3. Contratista</label>
+                                    <select id="prog-contract-select" onchange="updateProgFilters('contract', this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-[11px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500"></select>
+                                </div>
+                                <div>
+                                    <label class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block italic">4. Escribir número de OT</label>
+                                    <div class="relative">
+                                        <input type="text" id="prog-ot-search" oninput="updateProgFilters('ot', this.value)" placeholder="Ej: 1234567..." class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-[11px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500 italic">
+                                        <svg class="w-4 h-4 absolute right-4 top-1/2 -translate-y-1/2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de Checklist -->
                     <div class="bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-sm overflow-hidden relative">
                         <div id="edit-lock-overlay" class="absolute inset-0 bg-white/40 backdrop-blur-[1px] z-10 flex items-center justify-center">
                             <div class="bg-slate-900 text-white px-4 py-2 rounded-full font-black text-[10px] uppercase tracking-widest shadow-xl flex items-center gap-2">
                                 <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a5 5 0 00-5 5v2a2 2 0 00-2 2v5a2 2 0 002 2h10a2 2 0 002-2v-5a2 2 0 00-2-2V7a5 5 0 00-5-5zM7 7a3 3 0 116 0v2H7V7z"></path></svg>
-                                Solo Visualización (Sync con GS)
+                                Solo Visualización
                             </div>
                         </div>
                         <div class="overflow-x-auto">
@@ -184,307 +274,206 @@
     <script>
         const GS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSQytfNSqY_a1pU4Sk0bUth0HW9FovrPcvJnpkdZ_4VK5lvEWZ-vn-YQ1OlG3pYUPezhBOPnZg1k_uM/pub?output=csv';
         const GS_POST_URL = 'https://script.google.com/macros/s/AKfycbyhHUMM4FZ5Q28tgtH6GtnS9mMqf11GoPjhBbjShAJAoj7licLQLAvi0IH9SXRdNOfZVQ/exec';
-        
         const _K = { u: atob('YWRtaW4='), p: atob('MTIzNDU2') }; 
 
         const contractColors = { 'ABB': '#2563eb', 'PS': '#f59e0b', 'PRECISIÓN': '#10b981', 'MULTI-MARCA': '#8b5cf6', 'INTERNA': '#64748b', 'TODOS': '#94a3b8' };
         
         let dataStore = [];
-        let dayColumns = []; 
-        let activeDay = '';
+        let dayColumns = [];
+        let activeDay = 'TODOS';
         let activeContractFilter = 'TODOS';
-        let currentTab = 'heatmap';
-        let chartGeneral, chartRoom;
+        let currentTab = 'master';
+
+        let progFilters = { day: 'TODOS', room: 'TODAS', contract: 'TODOS', ot: '' };
+        let masterFilters = { area: 'TODAS', room: 'TODAS', contract: 'TODOS', day: 'TODOS', ot: '', description: '' };
+
         let isEditor = false;
         let pendingChanges = {};
-
         let localPersistence = JSON.parse(localStorage.getItem('pgp_local_sync') || '{}');
+        let chartGeneral, chartRoom;
 
-        window.onload = () => {
-            restoreState();
-            fetchData();
-        };
-
-        function saveState() {
-            const state = { activeDay, activeContractFilter, currentTab, isEditor, lastUpdate: Date.now() };
-            sessionStorage.setItem('pgp_state', JSON.stringify(state));
-        }
-
-        function restoreState() {
-            const saved = sessionStorage.getItem('pgp_state');
-            if (saved) {
-                const state = JSON.parse(saved);
-                activeDay = state.activeDay;
-                activeContractFilter = state.activeContractFilter;
-                currentTab = state.currentTab;
-                isEditor = state.isEditor;
-                if (isEditor) setTimeout(() => applyEditorUI(), 100);
-            }
-        }
-
-        function applyEditorUI() {
-            document.getElementById('mode-badge').textContent = 'Modo Editor';
-            document.getElementById('mode-badge').className = 'ml-2 px-2 py-0.5 rounded bg-blue-600 text-white text-[8px] font-black uppercase tracking-widest italic';
-            document.getElementById('edit-lock-overlay').classList.add('hidden');
-            document.getElementById('btn-login').textContent = 'Salir Editor';
-            document.getElementById('btn-login').onclick = handleLogout;
-            updateSyncFab();
-        }
-
-        function getTargetColumn() {
-            const now = new Date(); 
-            const startLimit = new Date('2026-05-25T00:00:00');
-            const endLimit = new Date('2026-06-08T23:59:59');
-            if (now < startLimit) return "Avance previo"; 
-            if (now >= startLimit && now <= endLimit) {
-                const day = String(now.getDate()).padStart(2, '0');
-                const month = String(now.getMonth() + 1).padStart(2, '0');
-                return `${day}/${month}/${now.getFullYear()}`;
-            }
-            return "Avance General";
-        }
-
-        function toggleAuthModal(show) {
-            const modal = document.getElementById('auth-modal');
-            modal.classList.toggle('hidden', !show);
-            if(show) {
-                document.getElementById('auth-error').classList.add('hidden');
-                document.getElementById('user-input').value = '';
-                document.getElementById('pass-input').value = '';
-            }
-        }
-
-        function handleLogin() {
-            const u = document.getElementById('user-input').value;
-            const p = document.getElementById('pass-input').value;
-            if(u === _K.u && p === _K.p) {
-                isEditor = true;
-                toggleAuthModal(false);
-                applyEditorUI();
-                saveState();
-                showToast("Acceso Editor Concedido", "✓");
-            } else {
-                document.getElementById('auth-error').classList.remove('hidden');
-            }
-        }
-
-        function handleLogout() {
-            if (Object.keys(pendingChanges).length > 0) {
-                if (!confirm("Tienes cambios sin sincronizar. Si sales se perderán. ¿Deseas salir?")) return;
-            }
-            isEditor = false;
-            pendingChanges = {};
-            document.getElementById('mode-badge').textContent = 'Modo Lector';
-            document.getElementById('mode-badge').className = 'ml-2 px-2 py-0.5 rounded bg-slate-100 text-slate-500 text-[8px] font-black uppercase tracking-widest italic';
-            document.getElementById('edit-lock-overlay').classList.remove('hidden');
-            document.getElementById('btn-login').textContent = 'Acceso Editor';
-            document.getElementById('btn-login').onclick = () => toggleAuthModal(true);
-            updateSyncFab();
-            saveState();
-            updateView();
-        }
+        window.onload = fetchData;
 
         async function fetchData() {
             document.getElementById('loading-overlay').classList.remove('hidden');
             try {
-                const response = await fetch(`${GS_CSV_URL}&t=${Date.now()}`);
-                const csvData = await response.text();
-                
-                Papa.parse(csvData.trim(), {
+                const res = await fetch(`${GS_CSV_URL}&t=${Date.now()}`);
+                const csv = await res.text();
+                Papa.parse(csv.trim(), {
                     header: false,
                     skipEmptyLines: true,
-                    complete: (results) => processDataByColIndex(results.data)
+                    complete: results => processData(results.data)
                 });
-            } catch (e) { 
-                console.error("Error cargando GS:", e); 
-                document.getElementById('status-text').textContent = "Error de Conexión";
+            } catch (e) {
+                console.error(e);
                 document.getElementById('loading-overlay').classList.add('hidden');
             }
         }
 
-        function processDataByColIndex(rows) {
-            if (rows.length < 2) return;
-            
-            const headerRow = rows[0].map(h => String(h || "").trim());
+        function processData(rows) {
+            const headers = rows[0].map(h => String(h || "").trim());
             const dataRows = rows.slice(1);
             
-            let arIdx = headerRow.indexOf("Avance General");
-            if (arIdx === -1) arIdx = 43; 
-
             dataStore = dataRows.map((row, idx) => {
-                const ot = String(row[headerRow.indexOf("OT PGP 2026")] || "S/OT").trim();
-                const csvValue = parseFloat(String(row[arIdx]).replace(',', '.').replace('%', '')) || 0;
-                
-                if (localPersistence[ot] !== undefined && Number(localPersistence[ot]) === Number(csvValue)) {
-                    delete localPersistence[ot];
-                    localStorage.setItem('pgp_local_sync', JSON.stringify(localPersistence));
-                }
-
+                const rowObj = {};
+                headers.forEach((h, i) => rowObj[h] = row[i]);
+                const ot = String(rowObj["OT PGP 2026"] || "S/OT").trim();
+                const csvValue = parseFloat(String(rowObj["Avance General"] || "0").replace(',', '.').replace('%', '')) || 0;
                 const finalValue = (localPersistence[ot] !== undefined) ? localPersistence[ot] : csvValue;
 
-                const rowObj = {};
-                headerRow.forEach((h, i) => rowObj[h] = row[i]);
+                let scheduledDate = "No Programada";
+                dayColumns = headers.filter(h => /^\d{2}\/\d{2}\/\d{4}$/.test(h));
+                for(let day of dayColumns) {
+                    if(String(rowObj[day]).trim() === "1") {
+                        scheduledDate = day;
+                        break;
+                    }
+                }
 
                 return {
                     id: idx,
-                    _AREA: String(rowObj["AREA"] || "").trim(),
                     _OT: ot,
-                    _DESCRIPCION: String(rowObj["DESCRIPCIÓN"] || rowObj["DESCRIPCIÓN PM03"] || "---").trim(),
-                    _UBICACION: String(rowObj["UBICACIÓN"] || "SALA N/A").trim().toUpperCase(),
-                    _CONTRATO: String(rowObj["EQUIPO DE TRABAJO"] || "S/C").trim().toUpperCase(),
+                    _AREA: String(rowObj["AREA"] || "N/A").trim().toUpperCase(),
+                    _DESCRIPCION: (rowObj["DESCRIPCIÓN"] || rowObj["DESCRIPCIÓN PM03"] || "---").trim(),
+                    _UBICACION: (rowObj["UBICACIÓN"] || "SALA N/A").trim().toUpperCase(),
+                    _CONTRATO: (rowObj["EQUIPO DE TRABAJO"] || "S/C").trim().toUpperCase(),
                     _POTENCIA: parseFloat(String(rowObj["POTENCIA KW"] || "0").replace(/[^0-9.]/g, '')) || 0,
-                    _AVANCE_ACTUAL: finalValue, 
+                    _AVANCE_ACTUAL: finalValue,
+                    _FECHA: scheduledDate,
                     raw: rowObj
                 };
             });
 
-            dayColumns = headerRow.filter(h => /^\d{2}\/\d{2}\/\d{4}$/.test(h));
-            
-            const rooms = new Set(dataStore.map(r => r._UBICACION));
-            const roomSelect = document.getElementById('room-curve-filter');
-            if (roomSelect) {
-                roomSelect.innerHTML = Array.from(rooms).sort().map(r => `<option value="${r}">${r}</option>`).join('');
-            }
-            
+            dayColumns = headers.filter(h => /^\d{2}\/\d{2}\/\d{4}$/.test(h));
+            populateFilters();
+            updateView();
+            document.getElementById('loading-overlay').classList.add('hidden');
+            document.getElementById('sync-time').textContent = new Date().toLocaleTimeString();
+            document.getElementById('status-dot').className = "bg-green-500 w-3 h-3 rounded-full shadow-sm";
+            document.getElementById('status-text').textContent = "Sincronizado";
+        }
+
+        function populateFilters() {
+            renderDayButtons();
             const contracts = ['TODOS', ...new Set(dataStore.map(r => r._CONTRATO))].sort();
             renderContractFilters(contracts);
-            renderDayButtons();
+
+            const rooms = ['TODAS', ...new Set(dataStore.map(r => r._UBICACION))].sort();
+            const areas = ['TODAS', ...new Set(dataStore.map(r => r._AREA))].sort();
             
-            if (!activeDay || !dayColumns.includes(activeDay)) {
-                activeDay = dayColumns[dayColumns.length - 1] || '';
-            }
+            const fillSelect = (id, list, selected) => {
+                const el = document.getElementById(id);
+                if(!el) return;
+                el.innerHTML = list.map(v => `<option value="${v}" ${v === selected ? 'selected' : ''}>${v}</option>`).join('');
+            };
+
+            fillSelect('prog-day-select', ['TODOS', ...dayColumns], progFilters.day);
+            fillSelect('prog-room-select', rooms, progFilters.room);
+            fillSelect('prog-contract-select', contracts, progFilters.contract);
             
-            document.getElementById('sync-time').textContent = new Date().toLocaleTimeString();
-            document.getElementById('status-dot').className = "bg-green-500 w-3 h-3 rounded-full";
-            document.getElementById('status-text').textContent = "Datos Sincronizados";
-            document.getElementById('loading-overlay').classList.add('hidden');
+            fillSelect('master-area-select', areas, masterFilters.area);
+            fillSelect('master-room-select', rooms, masterFilters.room);
+            fillSelect('master-contract-select', contracts, masterFilters.contract);
+            fillSelect('master-day-select', ['TODOS', ...dayColumns], masterFilters.day);
+
+            document.getElementById('room-curve-filter').innerHTML = rooms.filter(r => r !== 'TODAS').map(r => `<option value="${r}">${r}</option>`).join('');
+        }
+
+        function updateProgFilters(type, val) {
+            progFilters[type] = (type === 'ot') ? val.trim() : val;
+            renderProgress();
+        }
+
+        function updateMasterFilters(type, val) {
+            masterFilters[type] = (type === 'ot' || type === 'description') ? val.trim() : val;
+            renderMaster();
+        }
+
+        function getPowerStyles(pot) {
+            if (pot <= 50) return { label: 'Baja', color: '#10b981', bg: 'bg-emerald-50', text: 'text-emerald-600' };
+            if (pot <= 160) return { label: 'Media', color: '#f59e0b', bg: 'bg-orange-50', text: 'text-orange-600' };
+            return { label: 'Alta', color: '#e11d48', bg: 'bg-rose-50', text: 'text-rose-600' };
+        }
+
+        function renderMaster() {
+            const table = document.getElementById('master-table-body');
+            if(!table) return;
+            table.innerHTML = '';
             
-            updateView();
-        }
+            dataStore.forEach(row => {
+                const aM = masterFilters.area === 'TODAS' || row._AREA === masterFilters.area;
+                const rM = masterFilters.room === 'TODAS' || row._UBICACION === masterFilters.room;
+                const cM = masterFilters.contract === 'TODOS' || row._CONTRATO === masterFilters.contract;
+                const dM = masterFilters.day === 'TODOS' || String(row.raw[masterFilters.day]).trim() === "1";
+                const oM = masterFilters.ot === '' || row._OT.toLowerCase().includes(masterFilters.ot.toLowerCase());
+                const descM = masterFilters.description === '' || row._DESCRIPCION.toLowerCase().includes(masterFilters.description.toLowerCase());
 
-        function stageChange(ot, value, originalValue) {
-            if (!isEditor) return;
-            if (Number(value) === Number(originalValue)) {
-                delete pendingChanges[ot];
-            } else {
-                pendingChanges[ot] = { value, originalValue };
-            }
-            updateSyncFab();
-            renderProgress(); 
-        }
+                if (aM && rM && cM && dM && oM && descM) {
+                    const ps = getPowerStyles(row._POTENCIA);
+                    const cc = contractColors[row._CONTRATO] || '#94a3b8';
 
-        function updateSyncFab() {
-            const fab = document.getElementById('sync-fab');
-            const count = Object.keys(pendingChanges).length;
-            if (isEditor && count > 0) {
-                fab.classList.remove('hidden');
-                document.getElementById('sync-count').textContent = count;
-            } else {
-                fab.classList.add('hidden');
-            }
-        }
-
-        function confirmBulkUpdate() {
-            const count = Object.keys(pendingChanges).length;
-            document.getElementById('confirm-text').textContent = `¿Deseas enviar ${count} cambios acumulados a Google Sheets?`;
-            document.getElementById('confirm-modal').classList.remove('hidden');
-        }
-
-        function closeConfirm() {
-            document.getElementById('confirm-modal').classList.add('hidden');
-        }
-
-        async function sendBulkUpdate() {
-            const updatesList = Object.entries(pendingChanges);
-            if (updatesList.length === 0) return;
-
-            closeConfirm();
-            document.getElementById('loading-overlay').classList.remove('hidden');
-            document.getElementById('loading-text').textContent = `Enviando ${updatesList.length} cambios...`;
-
-            const targetCol = getTargetColumn();
-            const updates = [];
-            
-            updatesList.forEach(([ot, info]) => {
-                localPersistence[ot] = info.value;
-                updates.push({ ot: ot, value: info.value, column: targetCol });
-                updates.push({ ot: ot, value: info.value, column: "Avance General" });
+                    table.innerHTML += `<tr class="hover:bg-slate-50 transition-colors text-[11px]">
+                        <td class="py-4 px-2 font-bold text-slate-500 uppercase">${row._AREA}</td>
+                        <td class="py-4 px-2 font-black text-blue-600 uppercase">${row._OT}</td>
+                        <td class="py-4 px-2 font-bold text-slate-800">${row._DESCRIPCION}</td>
+                        <td class="py-4 px-2 font-bold text-slate-500 uppercase">${row._UBICACION}</td>
+                        <td class="py-4 px-2">
+                             <div class="flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full" style="background:${cc}"></span>
+                                <span class="font-black uppercase" style="color: ${cc}">${row._CONTRATO}</span>
+                            </div>
+                        </td>
+                        <td class="py-4 px-2">
+                            <span class="px-3 py-1 rounded-full font-black ${ps.bg} ${ps.text} border" style="border-color: ${ps.color}33">
+                                ${row._POTENCIA} kW
+                            </span>
+                        </td>
+                        <td class="py-4 px-2 text-right font-black text-slate-900">${row._FECHA}</td>
+                    </tr>`;
+                }
             });
-            localStorage.setItem('pgp_local_sync', JSON.stringify(localPersistence));
-
-            try {
-                pendingChanges = {}; 
-                updateSyncFab(); 
-
-                await fetch(GS_POST_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'text/plain' },
-                    body: JSON.stringify({ updates })
-                });
-
-                showToast("Cambios guardados localmente y enviados", "✓");
-                
-                setTimeout(() => {
-                    fetchData();
-                }, 500);
-
-            } catch (e) {
-                console.error(e);
-                showToast("Error de red, pero guardado localmente", "!");
-                document.getElementById('loading-overlay').classList.add('hidden');
-                fetchData();
-            }
-        }
-
-        function showToast(msg, icon) {
-            const t = document.getElementById('toast');
-            document.getElementById('toast-msg').textContent = msg;
-            document.getElementById('toast-icon').textContent = icon;
-            t.className = "fixed bottom-8 left-1/2 -translate-x-1/2 z-[150] px-6 py-3 rounded-full bg-slate-900 text-white font-black text-[10px] uppercase tracking-widest shadow-2xl transition-all opacity-100 translate-y-0";
-            setTimeout(() => {
-                t.className = "fixed bottom-8 left-1/2 -translate-x-1/2 z-[150] px-6 py-3 rounded-full bg-slate-900 text-white font-black text-[10px] uppercase tracking-widest shadow-2xl transition-all opacity-0 translate-y-10 pointer-events-none";
-            }, 3000);
         }
 
         function renderProgress() {
             const table = document.getElementById('progress-table-body');
-            if (!table) return;
+            if(!table) return;
             table.innerHTML = '';
             
             dataStore.forEach(row => {
-                if (activeContractFilter !== 'TODOS' && row._CONTRATO !== activeContractFilter) return;
-                const isScheduled = String(row.raw[activeDay] || "").trim() === "1";
-                if (!isScheduled) return;
+                const dM = progFilters.day === 'TODOS' || String(row.raw[progFilters.day]).trim() === "1";
+                const rM = progFilters.room === 'TODAS' || row._UBICACION === progFilters.room;
+                const cM = progFilters.contract === 'TODOS' || row._CONTRATO === progFilters.contract;
+                const oM = progFilters.ot === '' || row._OT.toLowerCase().includes(progFilters.ot.toLowerCase());
 
-                const isPending = pendingChanges[row._OT] !== undefined;
-                const displayValue = isPending ? pendingChanges[row._OT].value : row._AVANCE_ACTUAL;
-                
-                const cCol = contractColors[row._CONTRATO] || '#94a3b8';
-                
-                table.innerHTML += `<tr class="hover:bg-slate-50 transition-colors ${isPending ? 'pending-change' : ''}">
-                    <td class="py-4 px-2 font-black text-blue-600 text-[10px] uppercase">${row._OT}</td>
-                    <td class="py-4 px-2 font-bold text-slate-800 text-xs">${row._DESCRIPCION}</td>
-                    <td class="py-4 px-2 font-bold text-slate-500 text-[10px] uppercase">${row._UBICACION}</td>
-                    <td class="py-4 px-2 font-black text-[10px] uppercase" style="color: ${cCol}">${row._CONTRATO}</td>
-                    <td class="py-4 px-2">
-                        <div class="flex items-center justify-center gap-1">
-                            ${[0, 25, 50, 75, 100].map(v => `
-                                <button onclick="stageChange('${row._OT}', ${v}, ${row._AVANCE_ACTUAL})" 
-                                    class="progress-btn w-8 h-8 rounded-lg text-[9px] font-black transition-all border 
-                                    ${Number(displayValue) === v ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-slate-50 text-slate-400 border-slate-200 hover:border-slate-400'}">
-                                    ${v}
-                                </button>
-                            `).join('')}
-                        </div>
-                    </td>
-                    <td class="py-4 px-2 text-right font-black text-sm">
-                        <div class="flex flex-col items-end">
-                             <span class="${Number(displayValue) === 100 ? 'text-green-600' : 'text-slate-900'}">${displayValue}%</span>
-                             ${isPending ? `<span class="text-[8px] text-orange-600 uppercase font-black tracking-tighter mt-1 italic">Por Sincronizar</span>` : ''}
-                        </div>
-                    </td>
-                </tr>`;
+                if (dM && rM && cM && oM) {
+                    const isP = pendingChanges[row._OT] !== undefined;
+                    const val = isP ? pendingChanges[row._OT].value : row._AVANCE_ACTUAL;
+                    const c = contractColors[row._CONTRATO] || '#94a3b8';
+
+                    table.innerHTML += `<tr class="hover:bg-slate-50 transition-colors ${isP ? 'pending-change' : ''}">
+                        <td class="py-4 px-2 font-black text-blue-600 text-[10px] uppercase">${row._OT}</td>
+                        <td class="py-4 px-2 font-bold text-slate-800 text-xs">${row._DESCRIPCION}</td>
+                        <td class="py-4 px-2 font-bold text-slate-500 text-[10px] uppercase">${row._UBICACION}</td>
+                        <td class="py-4 px-2 font-black text-[10px] uppercase" style="color: ${c}">${row._CONTRATO}</td>
+                        <td class="py-4 px-2 text-center">
+                            <div class="flex items-center justify-center gap-1">
+                                ${[0, 25, 50, 75, 100].map(v => `
+                                    <button onclick="stageChange('${row._OT}', ${v}, ${row._AVANCE_ACTUAL})" 
+                                        class="progress-btn w-8 h-8 rounded-lg text-[9px] font-black transition-all border 
+                                        ${Number(val) === v ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-slate-50 text-slate-400 border-slate-200 hover:border-slate-400'}">
+                                        ${v}
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </td>
+                        <td class="py-4 px-2 text-right font-black text-sm">
+                            <div class="flex flex-col items-end">
+                                 <span class="${Number(val) === 100 ? 'text-green-600' : 'text-slate-900'}">${val}%</span>
+                                 ${isP ? `<span class="text-[8px] text-orange-600 uppercase font-black italic mt-1">Pendiente</span>` : ''}
+                            </div>
+                        </td>
+                    </tr>`;
+                }
             });
             renderCurves();
         }
@@ -493,92 +482,79 @@
             const ctxG = document.getElementById('generalCurveChart');
             const ctxR = document.getElementById('roomCurveChart');
             if (!ctxG || !ctxR) return;
-            
-            const filterEl = document.getElementById('room-curve-filter');
-            const selectedRoom = filterEl ? filterEl.value : '';
-            
             if (chartGeneral) chartGeneral.destroy();
             if (chartRoom) chartRoom.destroy();
             
-            const calcData = (dataset) => {
-                let plan = [], real = [], accPlan = 0;
-                const total = dataset.length || 1;
-                dayColumns.forEach(day => {
-                    const dailyPlan = dataset.filter(r => String(r.raw[day]).trim() === "1").length;
-                    accPlan += (dailyPlan / total) * 100;
-                    plan.push(Math.min(accPlan, 100).toFixed(1));
-                    
-                    const avgReal = dataset.reduce((s, r) => s + r._AVANCE_ACTUAL, 0) / total;
-                    real.push(avgReal.toFixed(1));
+            const roomEl = document.getElementById('room-curve-filter');
+            if(!roomEl) return;
+            const selectedRoom = roomEl.value;
+            
+            const calc = (ds) => {
+                let plan = [], real = [], acc = 0;
+                dayColumns.forEach(d => {
+                    acc += (ds.filter(r => String(r.raw[d]).trim() === "1").length / (ds.length || 1)) * 100;
+                    plan.push(Math.min(acc, 100).toFixed(1));
+                    real.push((ds.reduce((s, r) => s + r._AVANCE_ACTUAL, 0) / (ds.length || 1)).toFixed(1));
                 });
                 return { plan, real };
             };
-            
-            const genData = calcData(dataStore);
-            const roomData = calcData(dataStore.filter(r => r._UBICACION === selectedRoom));
-            
-            const commonCfg = {
-                responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { position: 'bottom', labels: { font: { size: 9, weight: 'bold' } } } },
-                scales: { y: { beginAtZero: true, max: 100 }, x: { ticks: { font: { size: 8 } } } }
-            };
-            
-            chartGeneral = new Chart(ctxG.getContext('2d'), {
-                type: 'line',
-                data: {
-                    labels: dayColumns.map(d => d.split('/')[0] + '/' + d.split('/')[1]),
-                    datasets: [
-                        { label: 'Plan %', data: genData.plan, borderColor: '#cbd5e1', borderDash: [4,4], pointRadius: 0 },
-                        { label: 'Real %', data: genData.real, borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)', fill: true, borderWidth: 3 }
-                    ]
-                },
-                options: commonCfg
-            });
-            
-            chartRoom = new Chart(ctxR.getContext('2d'), {
-                type: 'line',
-                data: {
-                    labels: dayColumns.map(d => d.split('/')[0] + '/' + d.split('/')[1]),
-                    datasets: [
-                        { label: 'Plan Área %', data: roomData.plan, borderColor: '#94a3b8', borderDash: [2,2], pointRadius: 0 },
-                        { label: 'Real Área %', data: roomData.real, borderColor: '#0ea5e9', backgroundColor: 'rgba(14, 165, 233, 0.1)', fill: true, borderWidth: 3 }
-                    ]
-                },
-                options: commonCfg
-            });
+
+            const gD = calc(dataStore);
+            const rD = calc(dataStore.filter(r => r._UBICACION === selectedRoom));
+
+            const opts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 9, weight: '800' } } } }, scales: { y: { beginAtZero: true, max: 100 }, x: { ticks: { font: { size: 8 } } } } };
+
+            chartGeneral = new Chart(ctxG, { type: 'line', data: { labels: dayColumns.map(d => d.slice(0,5)), datasets: [{ label: 'Plan %', data: gD.plan, borderColor: '#ccc', borderDash:[4,4], pointRadius: 0 }, { label: 'Real %', data: gD.real, borderColor: '#2563eb', fill: true, backgroundColor: 'rgba(37,99,235,0.05)' }] }, options: opts });
+            chartRoom = new Chart(ctxR, { type: 'line', data: { labels: dayColumns.map(d => d.slice(0,5)), datasets: [{ label: 'Plan Área %', data: rD.plan, borderColor: '#94a3b8', borderDash:[2,2], pointRadius: 0 }, { label: 'Real Área %', data: rD.real, borderColor: '#0ea5e9', fill: true, backgroundColor: 'rgba(14,165,233,0.05)' }] }, options: opts });
         }
 
         function renderHeatmap() {
             const grid = document.getElementById('heatmap-grid');
-            if (!grid) return;
+            if(!grid) return;
             grid.innerHTML = '';
             const rooms = {};
             dataStore.forEach(row => {
                 if (activeContractFilter !== 'TODOS' && row._CONTRATO !== activeContractFilter) return;
-                if (String(row.raw[activeDay]).trim() !== "1") return;
+                if (activeDay !== 'TODOS' && String(row.raw[activeDay]).trim() !== "1") return;
+                
                 if (!rooms[row._UBICACION]) rooms[row._UBICACION] = { total: 0, contracts: {} };
                 rooms[row._UBICACION].total++;
                 rooms[row._UBICACION].contracts[row._CONTRATO] = (rooms[row._UBICACION].contracts[row._CONTRATO] || 0) + 1;
             });
+
             Object.entries(rooms).sort().forEach(([name, data]) => {
                 const card = document.createElement('div');
-                card.className = "bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm card-glow";
-                card.innerHTML = `
-                    <div class="flex justify-between items-start mb-3">
-                        <h4 class="font-black text-slate-800 text-[10px] uppercase italic truncate pr-2">${name}</h4>
-                        <span class="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">${data.total} Eq.</span>
-                    </div>
-                    <div class="h-1.5 w-full bg-slate-100 rounded-full flex overflow-hidden mb-4">
-                        ${Object.entries(data.contracts).map(([c, count]) => `<div style="width:${(count/data.total)*100}%; background:${contractColors[c] || '#cbd5e1'}"></div>`).join('')}
-                    </div>
-                    <div class="border-t border-slate-50 pt-2 text-[9px]">
-                        ${Object.entries(data.contracts).map(([c, count]) => `
-                            <div class="flex items-center justify-between mt-1">
-                                <span class="font-bold text-slate-500">${c}</span>
-                                <span class="font-black text-slate-800">${count}</span>
+                card.className = "bg-white p-6 rounded-[2.5rem] border border-slate-200 shadow-sm card-glow flex flex-col";
+                
+                const breakdown = Object.entries(data.contracts)
+                    .map(([c, count]) => `
+                        <div class="flex items-center justify-between text-[10px] font-bold">
+                            <div class="flex items-center gap-1.5 truncate pr-2">
+                                <span class="w-1.5 h-1.5 rounded-full flex-shrink-0" style="background:${contractColors[c] || '#cbd5e1'}"></span>
+                                <span class="text-slate-500 uppercase truncate">${c}</span>
                             </div>
-                        `).join('')}
-                    </div>`;
+                            <span class="text-slate-900 font-black">${count}</span>
+                        </div>
+                    `).join('');
+
+                card.innerHTML = `
+                <div class="flex items-center justify-between mb-4 gap-4">
+                    <h4 class="font-black text-slate-800 text-[15px] uppercase tracking-tighter italic flex-1 truncate">${name}</h4>
+                    <div class="flex items-baseline gap-1 text-right flex-shrink-0">
+                        <span class="text-3xl font-black text-slate-900 tracking-tighter">${data.total}</span>
+                        <span class="text-[9px] font-black text-blue-600 uppercase italic leading-none">Equipos</span>
+                    </div>
+                </div>
+                
+                <div class="h-1.5 w-full bg-slate-100 rounded-full flex overflow-hidden mb-4">
+                    ${Object.entries(data.contracts).map(([c, count]) => `
+                        <div style="width:${(count/data.total)*100}%; background:${contractColors[c] || '#cbd5e1'}" title="${c}: ${count}"></div>
+                    `).join('')}
+                </div>
+                
+                <div class="space-y-1.5 mt-auto pt-4 border-t border-slate-50">
+                    ${breakdown}
+                </div>`;
                 grid.appendChild(card);
             });
         }
@@ -586,68 +562,151 @@
         function renderPower() {
             const sum = document.getElementById('power-summary');
             const table = document.getElementById('power-table-body');
-            if (!table || !sum) return;
+            if(!table) return;
             table.innerHTML = '';
             let stats = { l: 0, m: 0, h: 0 };
-            dataStore.filter(r => (activeContractFilter === 'TODOS' || r._CONTRATO === activeContractFilter) && String(r.raw[activeDay]).trim() === "1")
+            dataStore.filter(r => (activeContractFilter === 'TODOS' || r._CONTRATO === activeContractFilter) && (activeDay === 'TODOS' || String(r.raw[activeDay]).trim() === "1"))
             .forEach(row => {
-                let cfg = { c: "text-emerald-600", b: "bg-emerald-50" };
-                if (row._POTENCIA <= 50) stats.l++;
-                else if (row._POTENCIA <= 160) { stats.m++; cfg = { c: "text-orange-500", b: "bg-orange-50" }; }
-                else { stats.h++; cfg = { c: "text-rose-600", b: "bg-rose-50" }; }
+                const ps = getPowerStyles(row._POTENCIA);
+                if (ps.label === 'Baja') stats.l++;
+                else if (ps.label === 'Media') stats.m++;
+                else stats.h++;
+
+                const cColor = contractColors[row._CONTRATO] || '#94a3b8';
+
                 table.innerHTML += `<tr class="text-[11px] hover:bg-slate-50 transition-colors">
                     <td class="py-4 px-2 font-black text-blue-600 uppercase">${row._OT}</td>
                     <td class="py-4 px-2 font-bold text-slate-800">${row._DESCRIPCION}</td>
                     <td class="py-4 px-2 font-bold text-slate-500 uppercase">${row._UBICACION}</td>
-                    <td class="py-4 px-2 font-black text-slate-400 uppercase">${row._CONTRATO}</td>
-                    <td class="py-4 px-2 text-right"><span class="px-3 py-1 rounded-full font-black ${cfg.c} ${cfg.b}">${row._POTENCIA} kW</span></td>
+                    <td class="py-4 px-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full" style="background: ${cColor}"></span>
+                            <span class="font-black uppercase" style="color: ${cColor}">${row._CONTRATO}</span>
+                        </div>
+                    </td>
+                    <td class="py-4 px-2 text-right">
+                        <span class="px-3 py-1 rounded-full font-black ${ps.bg} ${ps.text} border" style="border-color: ${ps.color}33">
+                            ${row._POTENCIA} kW
+                        </span>
+                    </td>
                 </tr>`;
             });
-            sum.innerHTML = `
-                <div class="bg-white p-6 rounded-[2rem] border-b-4 border-emerald-500 shadow-sm"><p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Baja</p><p class="text-3xl font-black text-emerald-600">${stats.l}</p></div>
-                <div class="bg-white p-6 rounded-[2rem] border-b-4 border-orange-500 shadow-sm"><p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Media</p><p class="text-3xl font-black text-orange-500">${stats.m}</p></div>
-                <div class="bg-white p-6 rounded-[2rem] border-b-4 border-rose-500 shadow-sm"><p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Alta</p><p class="text-3xl font-black text-rose-600">${stats.h}</p></div>`;
+            if(sum) {
+                sum.innerHTML = `
+                    <div class="bg-white p-6 rounded-[2rem] border-b-4 border-emerald-500 shadow-sm"><p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Baja</p><p class="text-3xl font-black text-emerald-600">${stats.l}</p></div>
+                    <div class="bg-white p-6 rounded-[2rem] border-b-4 border-orange-500 shadow-sm"><p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Media</p><p class="text-3xl font-black text-orange-500">${stats.m}</p></div>
+                    <div class="bg-white p-6 rounded-[2rem] border-b-4 border-rose-500 shadow-sm"><p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Alta</p><p class="text-3xl font-black text-rose-600">${stats.h}</p></div>`;
+            }
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            ['master', 'heatmap', 'power', 'progress'].forEach(t => {
+                const el = document.getElementById(`view-${t}`);
+                if(el) el.classList.toggle('hidden', t !== tab);
+                const btn = document.getElementById(`btn-tab-${t}`);
+                if(btn) btn.className = t === tab ? 'tab-active pb-4 font-black uppercase text-xs tracking-widest whitespace-nowrap' : 'pb-4 font-black uppercase text-xs tracking-widest text-slate-400 hover:text-slate-600 whitespace-nowrap';
+            });
+            const showGlobalSidebar = (tab === 'heatmap' || tab === 'power');
+            const gs = document.getElementById('global-sidebar');
+            if(gs) gs.classList.toggle('hidden', !showGlobalSidebar);
+            const cc = document.getElementById('content-container');
+            if(cc) cc.className = !showGlobalSidebar ? 'lg:col-span-5 space-y-6' : 'lg:col-span-4 space-y-6';
+            updateView();
+        }
+
+        function updateView() {
+            if (currentTab === 'master') renderMaster();
+            if (currentTab === 'heatmap') renderHeatmap();
+            if (currentTab === 'power') renderPower();
+            if (currentTab === 'progress') renderProgress();
+        }
+
+        function stageChange(ot, value, originalValue) {
+            if (!isEditor) return;
+            if (Number(value) === Number(originalValue)) delete pendingChanges[ot];
+            else pendingChanges[ot] = { value, originalValue };
+            updateSyncFab();
+            renderProgress();
+        }
+
+        function updateSyncFab() {
+            const count = Object.keys(pendingChanges).length;
+            const fab = document.getElementById('sync-fab');
+            if(fab) fab.classList.toggle('hidden', !isEditor || count === 0);
+            const cnt = document.getElementById('sync-count');
+            if(cnt) cnt.textContent = count;
+        }
+
+        function toggleAuthModal(show) { document.getElementById('auth-modal').classList.toggle('hidden', !show); }
+
+        function handleLogin() {
+            if (document.getElementById('user-input').value === _K.u && document.getElementById('pass-input').value === _K.p) {
+                isEditor = true;
+                const mb = document.getElementById('mode-badge');
+                if(mb) mb.className = 'ml-2 px-2 py-0.5 rounded bg-blue-600 text-white text-[8px] font-black uppercase tracking-widest italic';
+                const lock = document.getElementById('edit-lock-overlay');
+                if(lock) lock.classList.add('hidden');
+                toggleAuthModal(false);
+                showToast("Editor Activo", "✓");
+            }
         }
 
         function renderDayButtons() {
-            const container = document.getElementById('day-buttons');
-            if (!container) return;
-            container.innerHTML = dayColumns.map(day => `
-                <button onclick="activeDay='${day}'; saveState(); renderDayButtons(); updateView();" 
-                    class="p-3 rounded-2xl text-[10px] font-black border transition-all ${activeDay === day ? 'bg-slate-900 text-white border-slate-900 shadow-md' : 'bg-white text-slate-400 border-slate-100 hover:border-slate-300'}">
-                    ${day.split('/')[0]}/${day.split('/')[1]}
+            const cont = document.getElementById('day-buttons');
+            if(!cont) return;
+            const days = ['TODOS', ...dayColumns];
+            cont.innerHTML = days.map(d => `
+                <button onclick="activeDay='${d}'; renderDayButtons(); updateView();" class="p-3 rounded-2xl text-[10px] font-black border transition-all ${activeDay === d ? 'bg-slate-900 text-white' : 'bg-white text-slate-400 border-slate-100'}">
+                    ${d === 'TODOS' ? 'TODOS' : d.slice(0,5)}
                 </button>
             `).join('');
         }
 
-        function renderContractFilters(contracts) {
-            const container = document.getElementById('contract-filters');
-            if (!container) return;
-            container.innerHTML = contracts.map(c => `
-                <button onclick="activeContractFilter='${c}'; saveState(); renderContractFilters([${contracts.map(x=>`'${x}'`).join(',')}]); updateView();"
-                    class="px-4 py-3 text-[10px] font-black text-left rounded-2xl border transition-all flex items-center gap-3 ${activeContractFilter === c ? 'bg-blue-50 border-blue-600 text-blue-600' : 'bg-white border-slate-100 text-slate-400 hover:bg-slate-50'}">
+        function renderContractFilters(cs) {
+            const cont = document.getElementById('contract-filters');
+            if(!cont) return;
+            cont.innerHTML = cs.map(c => `
+                <button onclick="activeContractFilter='${c}'; renderContractFilters([${cs.map(x=>`'${x}'`).join(',')}]); updateView();" class="px-4 py-3 text-[10px] font-black text-left rounded-2xl border transition-all flex items-center gap-3 ${activeContractFilter === c ? 'bg-blue-50 border-blue-600 text-blue-600' : 'bg-white border-slate-100 text-slate-400 hover:bg-slate-50'}">
                     <span class="w-2 h-2 rounded-full" style="background:${contractColors[c] || '#cbd5e1'}"></span> ${c}
                 </button>
             `).join('');
         }
 
-        function switchTab(tab) {
-            currentTab = tab;
-            saveState();
-            ['heatmap', 'power', 'progress'].forEach(t => {
-                const view = document.getElementById(`view-${t}`);
-                const btn = document.getElementById(`btn-tab-${t}`);
-                if (view) view.classList.toggle('hidden', t !== tab);
-                if (btn) btn.className = t === tab ? 'tab-active pb-4 font-black uppercase text-xs tracking-widest whitespace-nowrap' : 'pb-4 font-black uppercase text-xs tracking-widest text-slate-400 hover:text-slate-600 whitespace-nowrap';
-            });
-            updateView();
+        function showToast(m, i) {
+            const t = document.getElementById('toast');
+            if(!t) return;
+            document.getElementById('toast-msg').textContent = m;
+            document.getElementById('toast-icon').textContent = i;
+            t.classList.replace('opacity-0', 'opacity-100');
+            t.classList.replace('translate-y-10', 'translate-y-0');
+            setTimeout(() => {
+                t.classList.replace('opacity-100', 'opacity-0');
+                t.classList.replace('translate-y-0', 'translate-y-10');
+            }, 3000);
         }
 
-        function updateView() {
-            if (currentTab === 'heatmap') renderHeatmap();
-            if (currentTab === 'power') renderPower();
-            if (currentTab === 'progress') renderProgress();
+        async function sendBulkUpdate() {
+            document.getElementById('loading-overlay').classList.remove('hidden');
+            const updates = Object.entries(pendingChanges).map(([ot, info]) => {
+                localPersistence[ot] = info.value;
+                return { ot, value: info.value, column: "Avance General" };
+            });
+            localStorage.setItem('pgp_local_sync', JSON.stringify(localPersistence));
+            try {
+                await fetch(GS_POST_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ updates }) });
+                pendingChanges = {};
+                updateSyncFab();
+                document.getElementById('confirm-modal').classList.add('hidden');
+                fetchData();
+            } catch (e) { 
+                showToast("Error de envío", "!"); 
+                document.getElementById('loading-overlay').classList.add('hidden'); 
+            }
         }
+
+        function confirmBulkUpdate() { document.getElementById('confirm-modal').classList.remove('hidden'); }
+        function closeConfirm() { document.getElementById('confirm-modal').classList.add('hidden'); }
     </script>
 </body>
 </html>

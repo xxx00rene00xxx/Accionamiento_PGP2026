@@ -197,7 +197,7 @@
         let isEditor = false;
         let pendingChanges = {};
 
-        // SISTEMA DE CACHÉ LOCAL PARA FORZAR VISUALIZACIÓN
+        // SISTEMA DE CACHÉ LOCAL
         let localPersistence = JSON.parse(localStorage.getItem('pgp_local_sync') || '{}');
 
         window.onload = () => {
@@ -287,7 +287,6 @@
         async function fetchData() {
             document.getElementById('loading-overlay').classList.remove('hidden');
             try {
-                // Forzamos descarga sin caché
                 const response = await fetch(`${GS_CSV_URL}&t=${Date.now()}`);
                 const csvData = await response.text();
                 
@@ -309,7 +308,6 @@
             const headerRow = rows[0].map(h => String(h || "").trim());
             const dataRows = rows.slice(1);
             
-            // Columna AR (Avance General)
             let arIdx = headerRow.indexOf("Avance General");
             if (arIdx === -1) arIdx = 43; 
 
@@ -317,13 +315,11 @@
                 const ot = String(row[headerRow.indexOf("OT PGP 2026")] || "S/OT").trim();
                 const csvValue = parseFloat(String(row[arIdx]).replace(',', '.').replace('%', '')) || 0;
                 
-                // SISTEMA DE CRUCE: Si el CSV ya tiene el valor local, limpiamos la persistencia local
                 if (localPersistence[ot] !== undefined && Number(localPersistence[ot]) === Number(csvValue)) {
                     delete localPersistence[ot];
                     localStorage.setItem('pgp_local_sync', JSON.stringify(localPersistence));
                 }
 
-                // VALOR FINAL: Prioridad Local > CSV
                 const finalValue = (localPersistence[ot] !== undefined) ? localPersistence[ot] : csvValue;
 
                 const rowObj = {};
@@ -409,7 +405,6 @@
             const targetCol = getTargetColumn();
             const updates = [];
             
-            // Actualizamos la persistencia local ANTES de enviar para asegurar visualización inmediata
             updatesList.forEach(([ot, info]) => {
                 localPersistence[ot] = info.value;
                 updates.push({ ot: ot, value: info.value, column: targetCol });
@@ -418,7 +413,10 @@
             localStorage.setItem('pgp_local_sync', JSON.stringify(localPersistence));
 
             try {
-                // Envío asíncrono
+                // PRIMERO limpiamos el estado visual local
+                pendingChanges = {}; 
+                updateSyncFab(); // OCULTAR BOTÓN INMEDIATAMENTE
+
                 await fetch(GS_POST_URL, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -426,10 +424,8 @@
                     body: JSON.stringify({ updates })
                 });
 
-                pendingChanges = {};
                 showToast("Cambios guardados localmente y enviados", "✓");
                 
-                // Forzamos actualización visual inmediata desde el store local
                 setTimeout(() => {
                     fetchData();
                 }, 500);
@@ -463,7 +459,6 @@
                 if (!isScheduled) return;
 
                 const isPending = pendingChanges[row._OT] !== undefined;
-                // El valor final a mostrar es: Cambio pendiente > Persistencia Local > CSV
                 const displayValue = isPending ? pendingChanges[row._OT].value : row._AVANCE_ACTUAL;
                 
                 const cCol = contractColors[row._CONTRATO] || '#94a3b8';

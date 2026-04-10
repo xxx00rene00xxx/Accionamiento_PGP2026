@@ -47,7 +47,7 @@
 
     <div id="auth-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-6 hidden">
         <div class="bg-white p-8 rounded-[2.5rem] shadow-2xl border border-slate-100 w-full max-w-md text-center">
-            <h2 class="text-3xl font-black italic uppercase tracking-tighter text-slate-900 mb-2">Modo <span class="text-blue-600">Editor</span></h2>
+            <h2 class="text-3xl font-black italic uppercase tracking-tighter text-slate-900 mb-2">Modo <span class="text-blue-600">Notificador</span></h2>
             <div class="space-y-4">
                 <input type="text" id="user-input" placeholder="Usuario" class="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-bold text-sm">
                 <input type="password" id="pass-input" placeholder="Contraseña" class="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-bold text-sm">
@@ -77,10 +77,10 @@
                     <span id="status-text" class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Iniciando Sync...</span>
                     <span id="mode-badge" class="ml-2 px-2 py-0.5 rounded bg-slate-100 text-slate-500 text-[8px] font-black uppercase tracking-widest italic">Modo Lector</span>
                 </div>
-                <h1 class="text-4xl font-extrabold tracking-tighter text-slate-900 uppercase italic">Control <span class="text-blue-600 text-5xl">PGP 2026</span></h1>
+                <h1 class="text-4xl font-extrabold tracking-tighter text-slate-900 uppercase italic">Mantención Accionamiento (PTR230) <span class="text-blue-600 text-5xl">PGP 2026</span></h1>
             </div>
             <div class="flex flex-wrap items-center justify-end gap-3">
-                <button onclick="toggleAuthModal(true)" class="bg-white border-2 border-slate-900 text-slate-900 font-black px-6 py-3 rounded-2xl uppercase text-[10px] tracking-widest hover:bg-slate-900 hover:text-white transition-all">Acceso Editor</button>
+                <button onclick="toggleAuthModal(true)" class="bg-white border-2 border-slate-900 text-slate-900 font-black px-6 py-3 rounded-2xl uppercase text-[10px] tracking-widest hover:bg-slate-900 hover:text-white transition-all">Acceso Notificador</button>
                 <div class="bg-white border border-slate-200 px-6 py-3 rounded-3xl shadow-sm flex flex-col items-end min-w-[150px]">
                     <span id="sync-time" class="font-black text-xl leading-tight text-slate-800 uppercase">--:--</span>
                 </div>
@@ -88,21 +88,21 @@
         </header>
 
         <nav class="flex overflow-x-auto gap-8 mb-8 border-b border-slate-200 no-scrollbar">
-            <button onclick="switchTab('master')" id="btn-tab-master" class="tab-active pb-4 font-black uppercase text-xs tracking-widest whitespace-nowrap">Listado Maestro PGP</button>
-            <button onclick="switchTab('heatmap')" id="btn-tab-heatmap" class="pb-4 font-black uppercase text-xs tracking-widest text-slate-400 hover:text-slate-600 whitespace-nowrap">Ocupación Salas</button>
-            <button onclick="switchTab('power')" id="btn-tab-power" class="pb-4 font-black uppercase text-xs tracking-widest text-slate-400 hover:text-slate-600 whitespace-nowrap">Análisis Potencia</button>
-            <button onclick="switchTab('progress')" id="btn-tab-progress" class="pb-4 font-black uppercase text-xs tracking-widest text-slate-400 hover:text-slate-600 whitespace-nowrap">Checklist Avance</button>
+            <button onclick="switchTab('master')" id="btn-tab-master" class="tab-active pb-4 font-black uppercase text-xs tracking-widest whitespace-nowrap">Listado Trabajos Maestro PGP 2026</button>
+            <button onclick="switchTab('heatmap')" id="btn-tab-heatmap" class="pb-4 font-black uppercase text-xs tracking-widest text-slate-400 hover:text-slate-600 whitespace-nowrap">Análisis de Mantención por Locación</button>
+            <button onclick="switchTab('power')" id="btn-tab-power" class="pb-4 font-black uppercase text-xs tracking-widest text-slate-400 hover:text-slate-600 whitespace-nowrap">Análisis de Mantención por Potencia de Equipos</button>
+            <button onclick="switchTab('progress')" id="btn-tab-progress" class="pb-4 font-black uppercase text-xs tracking-widest text-slate-400 hover:text-slate-600 whitespace-nowrap">Notificación en línea PGP 2026</button>
         </nav>
 
         <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
             <!-- Sidebar Global -->
             <aside id="global-sidebar" class="lg:col-span-1 space-y-6 hidden">
                 <section class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200">
-                    <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 italic text-center">Seleccionar Día (Global)</h2>
+                    <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 italic text-center">Seleccionar Día</h2>
                     <div id="day-buttons" class="grid grid-cols-2 gap-2 max-h-[400px] overflow-y-auto no-scrollbar pr-1 text-center"></div>
                 </section>
                 <section class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200">
-                    <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 italic text-center">Contratista (Global)</h2>
+                    <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 italic text-center">Contrato</h2>
                     <div id="contract-filters" class="flex flex-col gap-2"></div>
                 </section>
             </aside>
@@ -115,7 +115,7 @@
                     <div class="bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-sm">
                         <div class="flex flex-col gap-6">
                             <div class="flex items-center gap-4">
-                                <h3 class="font-black text-lg italic uppercase text-slate-800">Filtro de lista:</h3>
+                                <h3 class="font-black text-lg italic uppercase text-slate-800">Filtro Trabajos Maestro PGP 2026:</h3>
                                 <div class="h-px flex-1 bg-slate-100"></div>
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
@@ -128,7 +128,7 @@
                                     <select id="master-room-select" onchange="updateMasterFilters('room', this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-[11px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500"></select>
                                 </div>
                                 <div>
-                                    <label class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block italic">Contratista</label>
+                                    <label class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block italic">Contrato</label>
                                     <select id="master-contract-select" onchange="updateMasterFilters('contract', this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-[11px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500"></select>
                                 </div>
                                 <div>
@@ -169,7 +169,7 @@
 
                 <!-- Vista Ocupación -->
                 <div id="view-heatmap" class="hidden space-y-6">
-                    <h2 class="font-black text-xl text-slate-800 italic uppercase">Equipos en Mantención por Sala</h2>
+                    <h2 class="font-black text-xl text-slate-800 italic uppercase">Análisis de Mantención por Locación</h2>
                     <div id="heatmap-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4"></div>
                 </div>
 
@@ -184,7 +184,7 @@
                                         <th class="pb-4 px-2">OT</th>
                                         <th class="pb-4 px-2">Descripción</th>
                                         <th class="pb-4 px-2">Sala</th>
-                                        <th class="pb-4 px-2">Contratista</th>
+                                        <th class="pb-4 px-2">Contrato</th>
                                         <th class="pb-4 px-2 text-right">Potencia</th>
                                     </tr>
                                 </thead>
@@ -204,7 +204,7 @@
                         </div>
                         <div class="bg-white rounded-[2.5rem] p-6 border border-slate-200 shadow-sm border-l-4 border-l-blue-600 h-[350px]">
                             <div class="flex justify-between items-center mb-2">
-                                <h3 class="font-black text-base tracking-tighter text-slate-900 italic uppercase">Por Área</h3>
+                                <h3 class="font-black text-base tracking-tighter text-slate-900 italic uppercase">Curva S por Área</h3>
                                 <select id="room-curve-filter" onchange="renderCurves()" class="bg-slate-50 border border-slate-200 text-[9px] font-black py-1 px-3 rounded-xl outline-none uppercase"></select>
                             </div>
                             <div class="relative h-[260px]"><canvas id="roomCurveChart"></canvas></div>
@@ -215,7 +215,7 @@
                     <div class="bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-sm">
                         <div class="flex flex-col gap-6">
                             <div class="flex items-center gap-4">
-                                <h3 class="font-black text-lg italic uppercase text-slate-800">Panel de Notificación</h3>
+                                <h3 class="font-black text-lg italic uppercase text-slate-800">Filtros Panel de Notificación</h3>
                                 <div class="h-px flex-1 bg-slate-100"></div>
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -228,7 +228,7 @@
                                     <select id="prog-room-select" onchange="updateProgFilters('room', this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-[11px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500"></select>
                                 </div>
                                 <div>
-                                    <label class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block italic">3. Contratista</label>
+                                    <label class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block italic">3. Contrato</label>
                                     <select id="prog-contract-select" onchange="updateProgFilters('contract', this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-[11px] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-blue-500"></select>
                                 </div>
                                 <div>
@@ -593,9 +593,9 @@
             });
             if(sum) {
                 sum.innerHTML = `
-                    <div class="bg-white p-6 rounded-[2rem] border-b-4 border-emerald-500 shadow-sm"><p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Baja</p><p class="text-3xl font-black text-emerald-600">${stats.l}</p></div>
-                    <div class="bg-white p-6 rounded-[2rem] border-b-4 border-orange-500 shadow-sm"><p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Media</p><p class="text-3xl font-black text-orange-500">${stats.m}</p></div>
-                    <div class="bg-white p-6 rounded-[2rem] border-b-4 border-rose-500 shadow-sm"><p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Alta</p><p class="text-3xl font-black text-rose-600">${stats.h}</p></div>`;
+                    <div class="bg-white p-6 rounded-[2rem] border-b-4 border-emerald-500 shadow-sm"><p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Baja (<50kW)</p><p class="text-3xl font-black text-emerald-600">${stats.l}</p></div>
+                    <div class="bg-white p-6 rounded-[2rem] border-b-4 border-orange-500 shadow-sm"><p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Media (>50KW a <160kW)</p><p class="text-3xl font-black text-orange-500">${stats.m}</p></div>
+                    <div class="bg-white p-6 rounded-[2rem] border-b-4 border-rose-500 shadow-sm"><p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Alta (>160kW)</p><p class="text-3xl font-black text-rose-600">${stats.h}</p></div>`;
             }
         }
 

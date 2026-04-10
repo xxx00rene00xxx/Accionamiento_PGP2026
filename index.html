@@ -197,6 +197,9 @@
         let isEditor = false;
         let pendingChanges = {};
 
+        // SISTEMA DE CACHÉ LOCAL PARA FORZAR VISUALIZACIÓN
+        let localPersistence = JSON.parse(localStorage.getItem('pgp_local_sync') || '{}');
+
         window.onload = () => {
             restoreState();
             fetchData();
@@ -284,11 +287,10 @@
         async function fetchData() {
             document.getElementById('loading-overlay').classList.remove('hidden');
             try {
-                // Forzamos descarga sin caché para asegurar datos frescos
-                const response = await fetch(`${GS_CSV_URL}&cachebust=${Date.now()}`);
+                // Forzamos descarga sin caché
+                const response = await fetch(`${GS_CSV_URL}&t=${Date.now()}`);
                 const csvData = await response.text();
                 
-                // Procesamos con header: false para mapear columnas por índice físico de forma segura
                 Papa.parse(csvData.trim(), {
                     header: false,
                     skipEmptyLines: true,
@@ -307,29 +309,35 @@
             const headerRow = rows[0].map(h => String(h || "").trim());
             const dataRows = rows.slice(1);
             
-            // Localizamos índices críticos. La columna AR es generalmente la 43 (índice 43 si A es 0)
-            // Pero la buscamos por nombre para ser resilientes, y si no, usamos el índice fijo 43.
+            // Columna AR (Avance General)
             let arIdx = headerRow.indexOf("Avance General");
-            if (arIdx === -1) arIdx = 43; // Fallback físico para AR
+            if (arIdx === -1) arIdx = 43; 
 
             dataStore = dataRows.map((row, idx) => {
-                // Extraemos el valor de la columna AR (Avance General)
-                const rawArValue = row[arIdx] || "0";
-                const cleanArValue = parseFloat(String(rawArValue).replace(',', '.').replace('%', '')) || 0;
+                const ot = String(row[headerRow.indexOf("OT PGP 2026")] || "S/OT").trim();
+                const csvValue = parseFloat(String(row[arIdx]).replace(',', '.').replace('%', '')) || 0;
+                
+                // SISTEMA DE CRUCE: Si el CSV ya tiene el valor local, limpiamos la persistencia local
+                if (localPersistence[ot] !== undefined && Number(localPersistence[ot]) === Number(csvValue)) {
+                    delete localPersistence[ot];
+                    localStorage.setItem('pgp_local_sync', JSON.stringify(localPersistence));
+                }
 
-                // Mapeo dinámico para mantener compatibilidad con el resto de la app
+                // VALOR FINAL: Prioridad Local > CSV
+                const finalValue = (localPersistence[ot] !== undefined) ? localPersistence[ot] : csvValue;
+
                 const rowObj = {};
                 headerRow.forEach((h, i) => rowObj[h] = row[i]);
 
                 return {
                     id: idx,
                     _AREA: String(rowObj["AREA"] || "").trim(),
-                    _OT: String(rowObj["OT PGP 2026"] || "S/OT").trim(),
+                    _OT: ot,
                     _DESCRIPCION: String(rowObj["DESCRIPCIÓN"] || rowObj["DESCRIPCIÓN PM03"] || "---").trim(),
                     _UBICACION: String(rowObj["UBICACIÓN"] || "SALA N/A").trim().toUpperCase(),
                     _CONTRATO: String(rowObj["EQUIPO DE TRABAJO"] || "S/C").trim().toUpperCase(),
                     _POTENCIA: parseFloat(String(rowObj["POTENCIA KW"] || "0").replace(/[^0-9.]/g, '')) || 0,
-                    _AVANCE_ACTUAL: cleanArValue, // ESTA ES LA VARIABLE CRÍTICA COLUMNA AR
+                    _AVANCE_ACTUAL: finalValue, 
                     raw: rowObj
                 };
             });
@@ -352,7 +360,7 @@
             
             document.getElementById('sync-time').textContent = new Date().toLocaleTimeString();
             document.getElementById('status-dot').className = "bg-green-500 w-3 h-3 rounded-full";
-            document.getElementById('status-text').textContent = "Google Sheets Conectado";
+            document.getElementById('status-text').textContent = "Datos Sincronizados";
             document.getElementById('loading-overlay').classList.add('hidden');
             
             updateView();
@@ -396,17 +404,21 @@
 
             closeConfirm();
             document.getElementById('loading-overlay').classList.remove('hidden');
-            document.getElementById('loading-text').textContent = `Sincronizando ${updatesList.length} cambios...`;
+            document.getElementById('loading-text').textContent = `Enviando ${updatesList.length} cambios...`;
 
             const targetCol = getTargetColumn();
             const updates = [];
             
+            // Actualizamos la persistencia local ANTES de enviar para asegurar visualización inmediata
             updatesList.forEach(([ot, info]) => {
+                localPersistence[ot] = info.value;
                 updates.push({ ot: ot, value: info.value, column: targetCol });
                 updates.push({ ot: ot, value: info.value, column: "Avance General" });
             });
+            localStorage.setItem('pgp_local_sync', JSON.stringify(localPersistence));
 
             try {
+                // Envío asíncrono
                 await fetch(GS_POST_URL, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -415,17 +427,18 @@
                 });
 
                 pendingChanges = {};
-                showToast("Sincronización Exitosa", "✓");
+                showToast("Cambios guardados localmente y enviados", "✓");
                 
-                // Recarga de datos tras pausa para que GS procese
+                // Forzamos actualización visual inmediata desde el store local
                 setTimeout(() => {
                     fetchData();
-                }, 2000);
+                }, 500);
 
             } catch (e) {
                 console.error(e);
-                showToast("Error de sincronización", "✕");
+                showToast("Error de red, pero guardado localmente", "!");
                 document.getElementById('loading-overlay').classList.add('hidden');
+                fetchData();
             }
         }
 
@@ -450,8 +463,8 @@
                 if (!isScheduled) return;
 
                 const isPending = pendingChanges[row._OT] !== undefined;
-                // El valor que se muestra y se usa para el estado de botones es _AVANCE_ACTUAL (Columna AR)
-                const currentProgressValue = isPending ? pendingChanges[row._OT].value : row._AVANCE_ACTUAL;
+                // El valor final a mostrar es: Cambio pendiente > Persistencia Local > CSV
+                const displayValue = isPending ? pendingChanges[row._OT].value : row._AVANCE_ACTUAL;
                 
                 const cCol = contractColors[row._CONTRATO] || '#94a3b8';
                 
@@ -465,7 +478,7 @@
                             ${[0, 25, 50, 75, 100].map(v => `
                                 <button onclick="stageChange('${row._OT}', ${v}, ${row._AVANCE_ACTUAL})" 
                                     class="progress-btn w-8 h-8 rounded-lg text-[9px] font-black transition-all border 
-                                    ${Number(currentProgressValue) === v ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-slate-50 text-slate-400 border-slate-200 hover:border-slate-400'}">
+                                    ${Number(displayValue) === v ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-slate-50 text-slate-400 border-slate-200 hover:border-slate-400'}">
                                     ${v}
                                 </button>
                             `).join('')}
@@ -473,8 +486,8 @@
                     </td>
                     <td class="py-4 px-2 text-right font-black text-sm">
                         <div class="flex flex-col items-end">
-                             <span class="${Number(currentProgressValue) === 100 ? 'text-green-600' : 'text-slate-900'}">${currentProgressValue}%</span>
-                             ${isPending ? `<span class="text-[8px] text-orange-600 uppercase font-black tracking-tighter mt-1 italic">Pendiente Envío</span>` : ''}
+                             <span class="${Number(displayValue) === 100 ? 'text-green-600' : 'text-slate-900'}">${displayValue}%</span>
+                             ${isPending ? `<span class="text-[8px] text-orange-600 uppercase font-black tracking-tighter mt-1 italic">Por Sincronizar</span>` : ''}
                         </div>
                     </td>
                 </tr>`;

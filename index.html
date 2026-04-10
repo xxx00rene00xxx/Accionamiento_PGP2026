@@ -74,7 +74,8 @@
         <span id="toast-msg">Mensaje</span>
     </div>
 
-    <div id="main-content" class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Contenedor Principal Ajustado (Márgenes más pequeños) -->
+    <div id="main-content" class="max-w-[98%] mx-auto px-2 md:px-4 py-8">
         <header class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-slate-200 pb-6">
             <div>
                 <div class="flex items-center gap-2 mb-1">
@@ -99,8 +100,8 @@
             <button onclick="switchTab('progress')" id="btn-tab-progress" class="pb-4 font-black uppercase text-xs tracking-widest text-slate-400 hover:text-slate-600 whitespace-nowrap">Checklist Avance</button>
         </nav>
 
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <aside class="space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            <aside class="lg:col-span-1 space-y-6">
                 <section class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200">
                     <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 italic text-center">Seleccionar Día</h2>
                     <div id="day-buttons" class="grid grid-cols-2 gap-2 max-h-[300px] overflow-y-auto pr-1 no-scrollbar text-center"></div>
@@ -111,10 +112,10 @@
                 </section>
             </aside>
 
-            <div class="lg:col-span-3">
+            <div class="lg:col-span-4">
                 <div id="view-heatmap" class="space-y-6">
                     <h2 class="font-black text-xl text-slate-800 italic uppercase">Equipos en Mantención por Sala</h2>
-                    <div id="heatmap-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+                    <div id="heatmap-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4"></div>
                 </div>
 
                 <div id="view-power" class="hidden space-y-6">
@@ -197,7 +198,6 @@
         let isEditor = false;
         let pendingChanges = {};
 
-        // SISTEMA DE CACHÉ LOCAL
         let localPersistence = JSON.parse(localStorage.getItem('pgp_local_sync') || '{}');
 
         window.onload = () => {
@@ -413,9 +413,8 @@
             localStorage.setItem('pgp_local_sync', JSON.stringify(localPersistence));
 
             try {
-                // PRIMERO limpiamos el estado visual local
                 pendingChanges = {}; 
-                updateSyncFab(); // OCULTAR BOTÓN INMEDIATAMENTE
+                updateSyncFab(); 
 
                 await fetch(GS_POST_URL, {
                     method: 'POST',

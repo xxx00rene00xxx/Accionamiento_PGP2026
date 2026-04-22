@@ -3,14 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PGP 2026 - Control de Avance</title>
+    <title>PGP 2026 - Programa y Control de Avance</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/ZRxbpbzZ/logo-rodape.png">
+    <link rel="shortcut icon" href="https://i.postimg.cc/ZRxbpbzZ/logo-rodape.png">
+    <!-- Embedded Styles for Chart Containers -->
+    
+
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .tab-active { border-bottom: 4px solid #2563eb; color: #2563eb; }
+        body { font-family: 'Inter', sans-serif;
+               background-color: #ffffff;}
+        .tab-active { border-bottom: 4px solid  #696158 ; color:  #696158 ; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .loader { border-top-color: #2563eb; animation: spinner 1.5s linear infinite; }
@@ -20,6 +31,29 @@
         .progress-btn:active { transform: scale(0.95); }
         .pending-change { background-color: #fff7ed !important; border-left: 4px solid #f97316 !important; }
         canvas { max-width: 100% !important; height: auto !important; }
+   
+   
+        .hero-section {
+            height: 20vh;
+            background-image: url('https://i.postimg.cc/5y5CHdnr/ARAUCO-01-1.png');
+            background-repeat: no-repeat;
+            background-size: 70vh;
+            background-position: center;
+            position: relative;
+            transition: filter 0.5s ease;
+        }
+        .hero-section.blurred {
+            filter: blur(5px);
+        }
+   
+   
+   
+   
+   
+   
+   
+   
+   
     </style>
 </head>
 <body class="bg-[#f8fafc] min-h-screen text-slate-900">
@@ -31,6 +65,51 @@
             <span class="uppercase text-xs tracking-widest">Sincronizar <span id="sync-count">0</span> Cambios</span>
         </button>
     </div>
+
+
+        <!-- Contenido Principal -->
+    <main class="main-content flex-1">
+        <!-- Hero Section: Desenfoque Din mico -->
+        <section class="hero-section flex items-end justify-end" id="heroSection">
+            <h1 class="text-2xl font-extrabold text-white text-shadow-lg p-4 bg-black bg-opacity-60 rounded-1g">
+                PGP 2026 - Programa y Control de Avance
+            </h1>
+        </section>
+  <!-- Main Container -->
+	<main class="max-w-[90%] mx-auto px-2 py-10">
+
+        <!-- Header Section -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-[#696158] mb-4">
+                 Programación y Control de Avance - PGP 2026
+            </h1>
+            <p class="text-lg text-[#696158] max-w-3xl mx-auto">
+                Celulosa Arauco Planta Constitución 
+            </p>
+
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <span id="status-dot" class="bg-slate-300 w-3 h-3 rounded-full"></span>
+                    <span id="status-text" class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Iniciando Sync...</span>
+                    <span id="mode-badge" class="ml-2 px-2 py-0.5 rounded bg-slate-100 text-slate-500 text-[8px] font-black uppercase tracking-widest italic">Modo Lector</span>
+          
+          <div class="flex w-full justify-end">
+           <div class="flex flex-wrap items-center justify-end gap-3">
+                <button id="auth-main-btn" onclick="handleAuthAction()" class="bg-white border-2 border-[#696158] text-[#696158] font-black px-6 py-3 rounded-2xl uppercase text-[10px] tracking-widest hover:bg-[#696158] hover:text-white transition-all">Acceso Notificador</button>
+                <div class="bg-white border border-slate-200 px-6 py-3 rounded-3xl shadow-sm flex flex-col items-end min-w-[150px]">
+                    <span id="sync-time" class="font-black text-xl leading-tight text-[#696158] uppercase">--:--</span>
+                </div>
+            </div>
+            </div>
+             <div class="max-w-[98%] mx-auto px-2 md:px-4 py-8">
+                  <header class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-slate-200 pb-6">
+                </header>
+        </header>
+
+
+
+
+
 
     <!-- Modales -->
     <div id="confirm-modal" class="fixed inset-0 z-[130] flex items-center justify-center p-6 hidden">
@@ -47,21 +126,26 @@
 
     <div id="auth-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-6 hidden">
         <div class="bg-white p-8 rounded-[2.5rem] shadow-2xl border border-slate-100 w-full max-w-md text-center">
-            <h2 class="text-3xl font-black italic uppercase tracking-tighter text-slate-900 mb-2">Modo <span class="text-blue-600">Notificador</span></h2>
+            <h2 class="text-3xl font-black italic uppercase tracking-tighter text-[#696158] mb-2">Acceso <span class="text-[#696158]">Notificador</span></h2>
             <div class="space-y-4">
-                <input type="text" id="user-input" placeholder="Usuario" class="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-bold text-sm">
+                <div class="flex items-center bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden focus-within:ring-2 focus-within:ring-blue-500">
+                    <input type="text" id="user-input" placeholder="Usuario" class="w-full px-6 py-4 bg-transparent outline-none font-bold text-sm">
+                    <span class="px-6 py-4 text-slate-400 font-bold text-sm bg-slate-100 border-l border-slate-200 select-none whitespace-nowrap">@alarms-report.com</span>
+                </div>
                 <input type="password" id="pass-input" placeholder="Contraseña" class="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-bold text-sm">
                 <div class="flex gap-2">
                     <button onclick="toggleAuthModal(false)" class="flex-1 bg-slate-100 text-slate-400 font-black py-4 rounded-2xl uppercase text-xs tracking-widest">Cancelar</button>
-                    <button onclick="handleLogin()" class="flex-[2] bg-slate-900 text-white font-black py-4 rounded-2xl uppercase text-xs tracking-widest">Entrar</button>
+                    <button onclick="handleLogin()" class="flex-[2] bg-[#696158] text-white font-black py-4 rounded-2xl uppercase text-xs tracking-widest">Entrar</button>
                 </div>
+                <p id="auth-error" class="hidden text-rose-500 text-[10px] font-black uppercase italic mt-2"></p>
             </div>
         </div>
     </div>
 
     <div id="loading-overlay" class="fixed inset-0 bg-white z-[60] flex flex-col items-center justify-center text-center px-6 hidden">
         <div class="loader ease-linear rounded-full border-4 border-t-4 border-slate-200 h-12 w-12 mb-4"></div>
-        <p class="font-black text-xs uppercase tracking-widest text-slate-400 italic">Procesando información...</p>
+        <p class="font-black text-xs uppercase tracking-widest text-slate-400 italic"> </p>
+        <p id="loading-text" class="font-black text-xs uppercase tracking-widest text-slate-400 italic">Procesando información...</p>
     </div>
 
     <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[150] px-6 py-3 rounded-full bg-slate-900 text-white font-black text-[10px] uppercase tracking-widest shadow-2xl transition-all opacity-0 translate-y-10 pointer-events-none flex items-center gap-3">
@@ -69,53 +153,51 @@
         <span id="toast-msg">Mensaje</span>
     </div>
 
-    <div class="max-w-[98%] mx-auto px-2 md:px-4 py-8">
-        <header class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-slate-200 pb-6">
-            <div>
-                <div class="flex items-center gap-2 mb-1">
-                    <span id="status-dot" class="bg-slate-300 w-3 h-3 rounded-full"></span>
-                    <span id="status-text" class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Iniciando Sync...</span>
-                    <span id="mode-badge" class="ml-2 px-2 py-0.5 rounded bg-slate-100 text-slate-500 text-[8px] font-black uppercase tracking-widest italic">Modo Lector</span>
-                </div>
-                <h1 class="text-4xl font-extrabold tracking-tighter text-slate-900 uppercase italic">Mantención Accionamiento (PTR343) <span class="text-blue-600 text-5xl">PGP 2026</span></h1>
-            </div>
-            <div class="flex flex-wrap items-center justify-end gap-3">
-                <button onclick="toggleAuthModal(true)" class="bg-white border-2 border-slate-900 text-slate-900 font-black px-6 py-3 rounded-2xl uppercase text-[10px] tracking-widest hover:bg-slate-900 hover:text-white transition-all">Acceso Notificador</button>
-                <div class="bg-white border border-slate-200 px-6 py-3 rounded-3xl shadow-sm flex flex-col items-end min-w-[150px]">
-                    <span id="sync-time" class="font-black text-xl leading-tight text-slate-800 uppercase">--:--</span>
-                </div>
-            </div>
-        </header>
 
-        <nav class="flex overflow-x-auto gap-8 mb-8 border-b border-slate-200 no-scrollbar">
+
+        <nav class="flex overflow-x-auto gap-8 mb-8 border-b border-slate-200  scrollbar">
             <button onclick="switchTab('master')" id="btn-tab-master" class="tab-active pb-4 font-black uppercase text-xs tracking-widest whitespace-nowrap">Listado Trabajos Maestro PGP 2026</button>
             <button onclick="switchTab('heatmap')" id="btn-tab-heatmap" class="pb-4 font-black uppercase text-xs tracking-widest text-slate-400 hover:text-slate-600 whitespace-nowrap">Análisis de Mantención por Locación</button>
             <button onclick="switchTab('power')" id="btn-tab-power" class="pb-4 font-black uppercase text-xs tracking-widest text-slate-400 hover:text-slate-600 whitespace-nowrap">Análisis de Mantención por Potencia de Equipos</button>
             <button onclick="switchTab('progress')" id="btn-tab-progress" class="pb-4 font-black uppercase text-xs tracking-widest text-slate-400 hover:text-slate-600 whitespace-nowrap">Notificación en línea PGP 2026</button>
+            <button id=btn.t-qaqc"onclick="window.location.href='https://accionamiento-qaqc.vercel.app/'" 
+    class="pb-4 font-black uppercase text-xs tracking-widest text-slate-400 hover:text-slate-600 whitespace-nowrap">
+    Reporte QAQC-PGP2026</button>
         </nav>
 
         <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
             <!-- Sidebar Global -->
             <aside id="global-sidebar" class="lg:col-span-1 space-y-6 hidden">
                 <section class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200">
-                    <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 italic text-center">Seleccionar Día</h2>
+                    <h2 class="text-[10px] font-black text-[#696158] uppercase tracking-widest mb-4 italic text-center">Seleccionar Día</h2>
                     <div id="day-buttons" class="grid grid-cols-2 gap-2 max-h-[400px] overflow-y-auto no-scrollbar pr-1 text-center"></div>
                 </section>
                 <section class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200">
-                    <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 italic text-center">Contrato</h2>
+                    <h2 class="text-[10px] font-black text-[#696158] uppercase tracking-widest mb-4 italic text-center">Contrato</h2>
                     <div id="contract-filters" class="flex flex-col gap-2"></div>
                 </section>
             </aside>
+
+
+
+
+
+
+
+
+
+
+
 
             <!-- Contenido Dinámico -->
             <div id="content-container" class="lg:col-span-5 space-y-6">
                 
                 <!-- VISTA 0: Listado Maestro -->
                 <div id="view-master" class="space-y-6">
-                    <div class="bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-sm">
+                    <div class="bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-sm  ">
                         <div class="flex flex-col gap-6">
                             <div class="flex items-center gap-4">
-                                <h3 class="font-black text-lg italic uppercase text-slate-800">Filtro Trabajos Maestro PGP 2026:</h3>
+                                <h3 class="font-black text-lg italic uppercase text-[#696158]">Filtro Trabajos Maestro PGP 2026:</h3>
                                 <div class="h-px flex-1 bg-slate-100"></div>
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
@@ -147,10 +229,10 @@
                         </div>
                     </div>
                     
-                    <div class="bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-sm overflow-hidden  ">
                         <div class="overflow-x-auto">
                             <table class="w-full text-left min-w-[1000px]">
-                                <thead class="border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                <thead class="border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-widest ">
                                     <tr>
                                         <th class="pb-4 px-2">Área</th>
                                         <th class="pb-4 px-2">OT</th>
@@ -169,8 +251,8 @@
 
                 <!-- Vista Ocupación -->
                 <div id="view-heatmap" class="hidden space-y-6">
-                    <h2 class="font-black text-xl text-slate-800 italic uppercase">Análisis de Mantención por Locación</h2>
-                    <div id="heatmap-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4"></div>
+                    <h2 class="font-black text-xl text-[#696158] italic uppercase">Análisis de Mantención por Locación</h2>
+                    <div id="heatmap-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 "></div>
                 </div>
 
                 <!-- Vista Potencia -->
@@ -198,13 +280,13 @@
                 <div id="view-progress" class="hidden space-y-8">
                     <!-- Curvas -->
                     <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                        <div class="bg-white rounded-[2.5rem] p-6 border border-slate-200 shadow-sm h-[350px]">
-                            <h3 class="font-black text-base tracking-tighter text-slate-900 mb-2 italic uppercase">Curva S Global</h3>
+                        <div class="bg-white rounded-[2.5rem] p-6 border border-slate-200 shadow-sm h-[350px]  ">
+                            <h3 class="font-black text-base tracking-tighter text-[#696158] mb-2 italic uppercase">Curva S Global</h3>
                             <div class="relative h-[260px]"><canvas id="generalCurveChart"></canvas></div>
                         </div>
-                        <div class="bg-white rounded-[2.5rem] p-6 border border-slate-200 shadow-sm border-l-4 border-l-blue-600 h-[350px]">
+                        <div class="bg-white rounded-[2.5rem] p-6 border border-slate-200 shadow-sm   h-[350px]">
                             <div class="flex justify-between items-center mb-2">
-                                <h3 class="font-black text-base tracking-tighter text-slate-900 italic uppercase">Curva S por Área</h3>
+                                <h3 class="font-black text-base tracking-tighter text-[#696158] italic uppercase">Curva S por Área</h3>
                                 <select id="room-curve-filter" onchange="renderCurves()" class="bg-slate-50 border border-slate-200 text-[9px] font-black py-1 px-3 rounded-xl outline-none uppercase"></select>
                             </div>
                             <div class="relative h-[260px]"><canvas id="roomCurveChart"></canvas></div>
@@ -212,7 +294,7 @@
                     </div>
 
                     <!-- Panel de Notificación Progress -->
-                    <div class="bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-sm">
+                    <div class="bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-sm  ">
                         <div class="flex flex-col gap-6">
                             <div class="flex items-center gap-4">
                                 <h3 class="font-black text-lg italic uppercase text-slate-800">Filtros Panel de Notificación</h3>
@@ -270,11 +352,18 @@
             </div>
         </div>
     </div>
-
+        <!-- Footer -->
+        <footer class="text-center text-slate-400 py-8 border-t border-slate-200 mt-12">
+            <p class="text-sm">Desarrollado por ROL</p>
+			<p class="text-sm">Unidad DCS & Accionamiento</p>
+        </footer>
     <script>
         const GS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSQytfNSqY_a1pU4Sk0bUth0HW9FovrPcvJnpkdZ_4VK5lvEWZ-vn-YQ1OlG3pYUPezhBOPnZg1k_uM/pub?output=csv';
         const GS_POST_URL = 'https://script.google.com/macros/s/AKfycbyhHUMM4FZ5Q28tgtH6GtnS9mMqf11GoPjhBbjShAJAoj7licLQLAvi0IH9SXRdNOfZVQ/exec';
-        const _K = { u: atob('YWRtaW4='), p: atob('MTIzNDU2') }; 
+        
+        const SUPABASE_URL = "https://rtfjfutvbwfcvlodzcbv.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_EEWPWL2h6JQ99kQQI00EjQ_-I_gAxvV";
+        const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         const contractColors = { 'ABB': '#2563eb', 'PS': '#f59e0b', 'PRECISIÓN': '#10b981', 'MULTI-MARCA': '#8b5cf6', 'INTERNA': '#64748b', 'TODOS': '#94a3b8' };
         
@@ -414,8 +503,8 @@
 
                     table.innerHTML += `<tr class="hover:bg-slate-50 transition-colors text-[11px]">
                         <td class="py-4 px-2 font-bold text-slate-500 uppercase">${row._AREA}</td>
-                        <td class="py-4 px-2 font-black text-blue-600 uppercase">${row._OT}</td>
-                        <td class="py-4 px-2 font-bold text-slate-800">${row._DESCRIPCION}</td>
+                        <td class="py-4 px-2 font-black text-[#EA7600] uppercase">${row._OT}</td>
+                        <td class="py-4 px-2 font-bold text-[#696158]">${row._DESCRIPCION}</td>
                         <td class="py-4 px-2 font-bold text-slate-500 uppercase">${row._UBICACION}</td>
                         <td class="py-4 px-2">
                              <div class="flex items-center gap-2">
@@ -451,7 +540,7 @@
                     const c = contractColors[row._CONTRATO] || '#94a3b8';
 
                     table.innerHTML += `<tr class="hover:bg-slate-50 transition-colors ${isP ? 'pending-change' : ''}">
-                        <td class="py-4 px-2 font-black text-blue-600 text-[10px] uppercase">${row._OT}</td>
+                        <td class="py-4 px-2 font-black text-[#EA7600] text-[10px] uppercase">${row._OT}</td>
                         <td class="py-4 px-2 font-bold text-slate-800 text-xs">${row._DESCRIPCION}</td>
                         <td class="py-4 px-2 font-bold text-slate-500 text-[10px] uppercase">${row._UBICACION}</td>
                         <td class="py-4 px-2 font-black text-[10px] uppercase" style="color: ${c}">${row._CONTRATO}</td>
@@ -460,7 +549,7 @@
                                 ${[0, 25, 50, 75, 100].map(v => `
                                     <button onclick="stageChange('${row._OT}', ${v}, ${row._AVANCE_ACTUAL})" 
                                         class="progress-btn w-8 h-8 rounded-lg text-[9px] font-black transition-all border 
-                                        ${Number(val) === v ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-slate-50 text-slate-400 border-slate-200 hover:border-slate-400'}">
+                                        ${Number(val) === v ? 'bg-[#EA7600] text-white border-[#EA7600] shadow-sm' : 'bg-slate-50 text-slate-400 border-slate-200 hover:border-slate-400'}">
                                         ${v}
                                     </button>
                                 `).join('')}
@@ -504,8 +593,8 @@
 
             const opts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 9, weight: '800' } } } }, scales: { y: { beginAtZero: true, max: 100 }, x: { ticks: { font: { size: 8 } } } } };
 
-            chartGeneral = new Chart(ctxG, { type: 'line', data: { labels: dayColumns.map(d => d.slice(0,5)), datasets: [{ label: 'Plan %', data: gD.plan, borderColor: '#ccc', borderDash:[4,4], pointRadius: 0 }, { label: 'Real %', data: gD.real, borderColor: '#2563eb', fill: true, backgroundColor: 'rgba(37,99,235,0.05)' }] }, options: opts });
-            chartRoom = new Chart(ctxR, { type: 'line', data: { labels: dayColumns.map(d => d.slice(0,5)), datasets: [{ label: 'Plan Área %', data: rD.plan, borderColor: '#94a3b8', borderDash:[2,2], pointRadius: 0 }, { label: 'Real Área %', data: rD.real, borderColor: '#0ea5e9', fill: true, backgroundColor: 'rgba(14,165,233,0.05)' }] }, options: opts });
+            chartGeneral = new Chart(ctxG, { type: 'line', data: { labels: dayColumns.map(d => d.slice(0,5)), datasets: [{ label: 'Plan %', data: gD.plan, borderColor: '#ccc', borderDash:[4,4], pointRadius: 0 }, { label: 'Real %', data: gD.real, borderColor: '#EA7600', fill: true, backgroundColor: 'rgba(37,99,235,0.05)' }] }, options: opts });
+            chartRoom = new Chart(ctxR, { type: 'line', data: { labels: dayColumns.map(d => d.slice(0,5)), datasets: [{ label: 'Plan Área %', data: rD.plan, borderColor: '#94a3b8', borderDash:[2,2], pointRadius: 0 }, { label: 'Real Área %', data: rD.real, borderColor: '#EA7600', fill: true, backgroundColor: 'rgba(14,165,233,0.05)' }] }, options: opts });
         }
 
         function renderHeatmap() {
@@ -533,16 +622,16 @@
                                 <span class="w-1.5 h-1.5 rounded-full flex-shrink-0" style="background:${contractColors[c] || '#cbd5e1'}"></span>
                                 <span class="text-slate-500 uppercase truncate">${c}</span>
                             </div>
-                            <span class="text-slate-900 font-black">${count}</span>
+                            <span class="text-slat700 font-black">${count}</span>
                         </div>
                     `).join('');
 
                 card.innerHTML = `
                 <div class="flex items-center justify-between mb-4 gap-4">
-                    <h4 class="font-black text-slate-800 text-[15px] uppercase tracking-tighter italic flex-1 truncate">${name}</h4>
+                    <h4 class="font-black text-[#696158] text-[15px] uppercase tracking-tighter italic flex-1 truncate">${name}</h4>
                     <div class="flex items-baseline gap-1 text-right flex-shrink-0">
-                        <span class="text-3xl font-black text-slate-900 tracking-tighter">${data.total}</span>
-                        <span class="text-[9px] font-black text-blue-600 uppercase italic leading-none">Equipos</span>
+                        <span class="text-3xl font-black text-[#EA7600] tracking-tighter">${data.total}</span>
+                        <span class="text-[9px] font-black text-[#696158] uppercase italic leading-none">Equipos</span>
                     </div>
                 </div>
                 
@@ -575,7 +664,7 @@
                 const cColor = contractColors[row._CONTRATO] || '#94a3b8';
 
                 table.innerHTML += `<tr class="text-[11px] hover:bg-slate-50 transition-colors">
-                    <td class="py-4 px-2 font-black text-blue-600 uppercase">${row._OT}</td>
+                    <td class="py-4 px-2 font-black text-[#EA7600] uppercase">${row._OT}</td>
                     <td class="py-4 px-2 font-bold text-slate-800">${row._DESCRIPCION}</td>
                     <td class="py-4 px-2 font-bold text-slate-500 uppercase">${row._UBICACION}</td>
                     <td class="py-4 px-2">
@@ -638,17 +727,83 @@
             if(cnt) cnt.textContent = count;
         }
 
-        function toggleAuthModal(show) { document.getElementById('auth-modal').classList.toggle('hidden', !show); }
+        function toggleAuthModal(show) { 
+            document.getElementById('auth-modal').classList.toggle('hidden', !show); 
+            if (show) {
+                const errEl = document.getElementById('auth-error');
+                if (errEl) errEl.classList.add('hidden');
+            }
+        }
 
-        function handleLogin() {
-            if (document.getElementById('user-input').value === _K.u && document.getElementById('pass-input').value === _K.p) {
+        async function handleAuthAction() {
+            if (isEditor) {
+                // Cerrar sesión
+                await _supabase.auth.signOut();
+                isEditor = false;
+                
+                // Limpiar campos de login
+                document.getElementById('user-input').value = '';
+                document.getElementById('pass-input').value = '';
+                
+                // Restaurar la vista
+                const mb = document.getElementById('mode-badge');
+                if(mb) mb.className = 'ml-2 px-2 py-0.5 rounded bg-slate-100 text-slate-500 text-[8px] font-black uppercase tracking-widest italic';
+                if(mb) mb.innerText = "Modo Lector";
+                const lock = document.getElementById('edit-lock-overlay');
+                if(lock) lock.classList.remove('hidden');
+                
+                document.getElementById('auth-main-btn').textContent = 'Acceso Notificador';
+                showToast("Sesión Cerrada", "ℹ");
+                
+                pendingChanges = {};
+                updateSyncFab();
+                renderProgress();
+            } else {
+                // Abrir modal de login
+                toggleAuthModal(true);
+            }
+        }
+
+        async function handleLogin() {
+            const userInput = document.getElementById('user-input').value.trim();
+            const p = document.getElementById('pass-input').value;
+            const errEl = document.getElementById('auth-error');
+            
+            if (!userInput || !p) {
+                if(errEl) { errEl.textContent = 'Ingrese usuario y contraseña'; errEl.classList.remove('hidden'); }
+                return;
+            }
+
+            const email = userInput + '@alarms-report.com';
+
+            document.getElementById('loading-overlay').classList.remove('hidden');
+            
+            // --- ESTA ES LA MEJORA DE SEGURIDAD ---
+            const loadingTextEl = document.querySelector('#loading-text');
+            if (loadingTextEl) {
+                loadingTextEl.textContent = "Autenticando...";
+            }
+            // --------------------------------------
+
+            const { data, error } = await _supabase.auth.signInWithPassword({
+                email: email,
+                password: p,
+            });
+
+            document.getElementById('loading-overlay').classList.add('hidden');
+
+            if (error) {
+                if(errEl) { errEl.textContent = 'Credenciales Incorrectas'; errEl.classList.remove('hidden'); }
+            } else {
                 isEditor = true;
                 const mb = document.getElementById('mode-badge');
-                if(mb) mb.className = 'ml-2 px-2 py-0.5 rounded bg-blue-600 text-white text-[8px] font-black uppercase tracking-widest italic';
+                if(mb) mb.className = 'ml-2 px-2 py-0.5 rounded bg-[#696158] text-white text-[8px] font-black uppercase tracking-widest italic';
+                if(mb) mb.innerText = "Modo Notificador";
                 const lock = document.getElementById('edit-lock-overlay');
                 if(lock) lock.classList.add('hidden');
                 toggleAuthModal(false);
-                showToast("Editor Activo", "✓");
+                document.getElementById('auth-main-btn').textContent = 'Cerrar Sesión';
+                showToast("Modo Notificador Activo", "✓");
             }
         }
 
@@ -657,7 +812,7 @@
             if(!cont) return;
             const days = ['TODOS', ...dayColumns];
             cont.innerHTML = days.map(d => `
-                <button onclick="activeDay='${d}'; renderDayButtons(); updateView();" class="p-3 rounded-2xl text-[10px] font-black border transition-all ${activeDay === d ? 'bg-slate-900 text-white' : 'bg-white text-slate-400 border-slate-100'}">
+                <button onclick="activeDay='${d}'; renderDayButtons(); updateView();" class="p-3 rounded-2xl text-[10px] font-black border transition-all ${activeDay === d ? 'bg-[#696158] text-white' : 'bg-white text-slate-400 border-slate-100'}">
                     ${d === 'TODOS' ? 'TODOS' : d.slice(0,5)}
                 </button>
             `).join('');

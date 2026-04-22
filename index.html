@@ -398,8 +398,36 @@
         let localPersistence = JSON.parse(localStorage.getItem('pgp_local_sync') || '{}');
         let chartGeneral, chartRoom;
 
-        window.onload = fetchData;
+        window.onload = async () => {
+    await checkActiveSession(); // 1. Revisa si ya estabas logueado
+    fetchData();                // 2. Carga los datos de Google Sheets
+	};
 
+		
+		
+		async function checkActiveSession() {
+    const { data: { session }, error } = await _supabase.auth.getSession();
+    
+    if (session) {
+        // Si hay una sesión activa, restauramos el estado de Editor/Notificador
+        isEditor = true;
+        
+        // Actualizamos la interfaz visual
+        const mb = document.getElementById('mode-badge');
+        if(mb) {
+            mb.className = 'ml-2 px-2 py-0.5 rounded bg-[#696158] text-white text-[8px] font-black uppercase tracking-widest italic';
+            mb.innerText = "Modo Notificador";
+        }
+        
+        const lock = document.getElementById('edit-lock-overlay');
+        if(lock) lock.classList.add('hidden');
+        
+        document.getElementById('auth-main-btn').textContent = 'Cerrar Sesión';
+        
+        // Opcional: mostrar un mensaje silencioso de que se recuperó la sesión
+        console.log("Sesión recuperada exitosamente");
+    }
+}
         async function fetchData() {
             document.getElementById('loading-overlay').classList.remove('hidden');
             try {
@@ -880,5 +908,7 @@
         function confirmBulkUpdate() { document.getElementById('confirm-modal').classList.remove('hidden'); }
         function closeConfirm() { document.getElementById('confirm-modal').classList.add('hidden'); }
     </script>
+
+		
 </body>
 </html>

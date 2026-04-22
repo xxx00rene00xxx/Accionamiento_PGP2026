@@ -112,17 +112,19 @@
 
 
     <!-- Modales -->
-    <div id="confirm-modal" class="fixed inset-0 z-[130] flex items-center justify-center p-6 hidden">
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
-        <div class="relative bg-white p-8 rounded-[2.5rem] shadow-2xl border border-slate-100 w-full max-sm text-center">
-            <h3 class="text-xl font-black text-[#696158] uppercase italic mb-2">Confirmar Envío</h3>
-            <p id="confirm-text" class="text-sm text-slate-500 font-bold mb-6 italic">¿Deseas enviar las modificaciones?</p>
-            <div class="flex gap-2">
-                <button onclick="closeConfirm()" class="flex-1 bg-slate-100 text-slate-400 font-black py-4 rounded-2xl uppercase text-xs tracking-widest">Revisar</button>
-                <button onclick="sendBulkUpdate()" class="flex-[2] bg-[#EA7600] text-white font-black py-4 rounded-2xl uppercase text-xs tracking-widest shadow-lg shadow-blue-100">Sí, Sincronizar</button>
-            </div>
+<div id="confirm-modal" class="fixed inset-0 z-[130] flex items-center justify-center p-4 hidden">
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+    
+    <div class="relative bg-white p-8 rounded-[2.5rem] shadow-2xl border border-slate-100 w-full max-w-sm mx-auto text-center">
+        <h3 class="text-xl font-black text-[#696158] uppercase italic mb-2">Confirmar Envío</h3>
+        <p id="confirm-text" class="text-sm text-slate-500 font-bold mb-6 italic">¿Deseas enviar las modificaciones?</p>
+        
+        <div class="flex gap-2">
+            <button onclick="closeConfirm()" class="flex-1 bg-slate-100 text-slate-400 font-black py-4 rounded-2xl uppercase text-xs tracking-widest">Revisar</button>
+            <button onclick="sendBulkUpdate()" class="flex-[2] bg-[#EA7600] text-white font-black py-4 rounded-2xl uppercase text-xs tracking-widest shadow-lg shadow-orange-100">Sí, Sincronizar</button>
         </div>
     </div>
+</div>
 
     <div id="auth-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-6 hidden">
         <div class="bg-white p-8 rounded-[2.5rem] shadow-2xl border border-slate-100 w-full max-w-md text-center">
